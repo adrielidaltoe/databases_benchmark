@@ -1,0 +1,4 @@
+duckdb>=1.4
+psycopg[binary]>=3.2
+clickhouse-connect>=0.9
+pyarrow>=21

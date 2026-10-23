@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker ps)",
+      "Bash(docker ps *)",
+      "Bash(docker logs *)",
+      "Bash(docker stats --no-stream *)",
+      "Bash(docker inspect *)",
+      "Bash(docker exec *)",
+      "Bash(docker compose --profile pg up -d)",
+      "Bash(docker compose --profile ch up -d)",
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(ls *)",
+      "Bash(du *)",
+      "Bash(free -h)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)"
+    ],
+    "deny": [
+      "Bash(docker volume rm *)",
+      "Bash(docker system prune *)",
+      "Bash(rm -rf *)",
+      "Bash(sudo *)",
+      "Bash(git push *)"
+    ]
+  }
+}

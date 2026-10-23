@@ -1,0 +1,170 @@
+{
+  "engine": "postgres",
+  "sf": 1,
+  "timestamp": "20261023T194548Z",
+  "version": "PostgreSQL 17.11 (Debian 17.11-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+  "settings": {
+    "checkpoint_timeout": "900s",
+    "DateStyle": "ISO, MDY",
+    "default_text_search_config": "pg_catalog.english",
+    "dynamic_shared_memory_type": "posix",
+    "effective_cache_size": "3932168kB",
+    "lc_messages": "en_US.utf8",
+    "lc_monetary": "en_US.utf8",
+    "lc_numeric": "en_US.utf8",
+    "lc_time": "en_US.utf8",
+    "listen_addresses": "*",
+    "log_timezone": "Etc/UTC",
+    "maintenance_work_mem": "524288kB",
+    "max_connections": "100",
+    "max_parallel_workers": "3",
+    "max_parallel_workers_per_gather": "2",
+    "max_wal_size": "4096MB",
+    "max_worker_processes": "4",
+    "min_wal_size": "80MB",
+    "random_page_cost": "1.1",
+    "search_path": "sf1",
+    "shared_buffers": "1310728kB",
+    "statement_timeout": "1800000ms",
+    "TimeZone": "Etc/UTC",
+    "work_mem": "65536kB"
+  },
+  "batch_rows": 500000,
+  "phases_s": {
+    "create_tables": 0.041,
+    "copy": 81.653,
+    "indexes": 52.328,
+    "vacuum_analyze": 14.307,
+    "checkpoint": 3.763
+  },
+  "total_load_s": 152.093,
+  "parquet_bytes": 227184209,
+  "tables": {
+    "region": {
+      "rows": 5,
+      "copy_s": 0.039,
+      "data_bytes": 40960,
+      "index_bytes": 16384,
+      "total_bytes": 57344
+    },
+    "nation": {
+      "rows": 25,
+      "copy_s": 0.007,
+      "data_bytes": 40960,
+      "index_bytes": 32768,
+      "total_bytes": 73728
+    },
+    "supplier": {
+      "rows": 10000,
+      "copy_s": 0.065,
+      "data_bytes": 1785856,
+      "index_bytes": 335872,
+      "total_bytes": 2121728
+    },
+    "customer": {
+      "rows": 150000,
+      "copy_s": 1.684,
+      "data_bytes": 29327360,
+      "index_bytes": 4456448,
+      "total_bytes": 33783808
+    },
+    "part": {
+      "rows": 200000,
+      "copy_s": 1.548,
+      "data_bytes": 30466048,
+      "index_bytes": 4513792,
+      "total_bytes": 34979840
+    },
+    "partsupp": {
+      "rows": 800000,
+      "copy_s": 6.468,
+      "data_bytes": 143564800,
+      "index_bytes": 23494656,
+      "total_bytes": 167059456
+    },
+    "orders": {
+      "rows": 1500000,
+      "copy_s": 13.53,
+      "data_bytes": 212746240,
+      "index_bytes": 57237504,
+      "total_bytes": 269983744
+    },
+    "lineitem": {
+      "rows": 6001215,
+      "copy_s": 58.312,
+      "data_bytes": 832364544,
+      "index_bytes": 335478784,
+      "total_bytes": 1167843328
+    }
+  },
+  "indexes": [
+    {
+      "sql": "ALTER TABLE region   ADD PRIMARY KEY (r_regionkey)",
+      "s": 0.025
+    },
+    {
+      "sql": "ALTER TABLE nation   ADD PRIMARY KEY (n_nationkey)",
+      "s": 0.004
+    },
+    {
+      "sql": "ALTER TABLE supplier ADD PRIMARY KEY (s_suppkey)",
+      "s": 0.013
+    },
+    {
+      "sql": "ALTER TABLE customer ADD PRIMARY KEY (c_custkey)",
+      "s": 0.089
+    },
+    {
+      "sql": "ALTER TABLE part     ADD PRIMARY KEY (p_partkey)",
+      "s": 0.194
+    },
+    {
+      "sql": "ALTER TABLE partsupp ADD PRIMARY KEY (ps_partkey, ps_suppkey)",
+      "s": 1.129
+    },
+    {
+      "sql": "ALTER TABLE orders   ADD PRIMARY KEY (o_orderkey)",
+      "s": 1.353
+    },
+    {
+      "sql": "ALTER TABLE lineitem ADD PRIMARY KEY (l_orderkey, l_linenumber)",
+      "s": 23.142
+    },
+    {
+      "sql": "CREATE INDEX nation_n_regionkey_idx   ON nation   (n_regionkey)",
+      "s": 0.121
+    },
+    {
+      "sql": "CREATE INDEX supplier_s_nationkey_idx ON supplier (s_nationkey)",
+      "s": 0.084
+    },
+    {
+      "sql": "CREATE INDEX customer_c_nationkey_idx ON customer (c_nationkey)",
+      "s": 0.115
+    },
+    {
+      "sql": "CREATE INDEX partsupp_ps_suppkey_idx  ON partsupp (ps_suppkey)",
+      "s": 0.606
+    },
+    {
+      "sql": "CREATE INDEX orders_o_custkey_idx     ON orders   (o_custkey)",
+      "s": 0.813
+    },
+    {
+      "sql": "CREATE INDEX lineitem_part_supp_idx   ON lineitem (l_partkey, l_suppkey)",
+      "s": 6.108
+    },
+    {
+      "sql": "CREATE INDEX lineitem_l_suppkey_idx   ON lineitem (l_suppkey)",
+      "s": 11.04
+    },
+    {
+      "sql": "CREATE INDEX orders_o_orderdate_idx   ON orders   (o_orderdate)",
+      "s": 0.901
+    },
+    {
+      "sql": "CREATE INDEX lineitem_l_shipdate_idx  ON lineitem (l_shipdate)",
+      "s": 6.203
+    }
+  ]
+}
