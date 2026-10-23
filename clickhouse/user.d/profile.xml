@@ -1,0 +1,15 @@
+<clickhouse>
+    <profiles>
+        <default>
+            <!-- Per-query memory cap -->
+            <max_memory_usage>3000000000</max_memory_usage>
+            <!-- Match the 3 CPUs given to the container (and to Postgres) -->
+            <max_threads>3</max_threads>
+            <!-- Spill big GROUP BY / ORDER BY to disk instead of failing -->
+            <max_bytes_before_external_group_by>1500000000</max_bytes_before_external_group_by>
+            <max_bytes_before_external_sort>1500000000</max_bytes_before_external_sort>
+            <!-- Same 30 min ceiling as Postgres statement_timeout -->
+            <max_execution_time>1800</max_execution_time>
+        </default>
+    </profiles>
+</clickhouse>

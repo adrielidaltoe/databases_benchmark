@@ -1,0 +1,13 @@
+<clickhouse>
+    <!-- Hard cap for the whole server, below the 4 GB container limit,
+         so ClickHouse fails a query cleanly instead of being OOM-killed -->
+    <max_server_memory_usage>3500000000</max_server_memory_usage>
+ 
+    <!-- Defaults assume much more RAM -->
+    <mark_cache_size>268435456</mark_cache_size>          <!-- 256 MB -->
+    <uncompressed_cache_size>0</uncompressed_cache_size>
+ 
+    <logger>
+        <level>warning</level>
+    </logger>
+</clickhouse>

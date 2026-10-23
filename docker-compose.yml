@@ -1,0 +1,66 @@
+# Benchmark environment: PostgreSQL (row-store) vs ClickHouse (columnar)
+# Both engines get IDENTICAL limits: 3 CPUs, 4 GB RAM.
+# Run ONE at a time using profiles:
+#   docker compose --profile pg up -d     /  docker compose --profile pg down
+#   docker compose --profile ch up -d     /  docker compose --profile ch down
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: bench_pg
+    profiles: ["pg"]
+    cpus: 3.0
+    mem_limit: 4g
+    shm_size: 1g            # Docker's 64MB default breaks parallel queries
+    environment:
+      POSTGRES_USER: bench
+      POSTGRES_PASSWORD: bench
+      POSTGRES_DB: bench
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./data:/data:ro       # shared source files (CSV/Parquet) for loading
+    command: >
+      postgres
+      -c shared_buffers=1GB
+      -c effective_cache_size=3GB
+      -c work_mem=64MB
+      -c maintenance_work_mem=512MB
+      -c max_worker_processes=4
+      -c max_parallel_workers=3
+      -c max_parallel_workers_per_gather=2
+      -c random_page_cost=1.1
+      -c max_wal_size=4GB
+      -c checkpoint_timeout=15min
+      -c statement_timeout=30min
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.8
+    container_name: bench_ch
+    profiles: ["ch"]
+    cpus: 3.0
+    mem_limit: 4g
+    environment:
+      CLICKHOUSE_USER: bench
+      CLICKHOUSE_PASSWORD: bench
+      CLICKHOUSE_DB: bench
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    ports:
+      - "8123:8123"   # HTTP (used by clickhouse-connect in Python)
+      - "9000:9000"   # native protocol (clickhouse-client)
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - ch_data:/var/lib/clickhouse
+      # Mount single files, not whole folders: the entrypoint writes its own
+      # users.d/default-user.xml to create the 'bench' user
+      - ./clickhouse/config.d/memory.xml:/etc/clickhouse-server/config.d/memory.xml:ro
+      - ./clickhouse/users.d/profile.xml:/etc/clickhouse-server/users.d/profile.xml:ro
+      - ./data:/data:ro       # shared source files (CSV/Parquet) for loading
+
+volumes:
+  pg_data:
+  ch_data:
