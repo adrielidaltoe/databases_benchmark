@@ -1,0 +1,123 @@
+{
+  "engine": "clickhouse",
+  "sf": 1,
+  "timestamp": "20261023T194629Z",
+  "version": "25.8.33.6",
+  "settings": {
+    "cancel_http_readonly_queries_on_client_close": "1",
+    "cast_string_to_dynamic_use_inference": "1",
+    "date_time_input_format": "best_effort",
+    "enable_http_compression": "1",
+    "http_headers_progress_interval_ms": "120000",
+    "max_bytes_before_external_group_by": "1500000000",
+    "max_bytes_before_external_sort": "1500000000",
+    "max_execution_time": "1800",
+    "max_memory_usage": "3000000000",
+    "max_threads": "3",
+    "send_progress_in_http_headers": "1"
+  },
+  "server_settings": {
+    "async_load_databases": "1",
+    "concurrent_threads_scheduler": "fair_round_robin",
+    "concurrent_threads_soft_limit_num": "0",
+    "concurrent_threads_soft_limit_ratio_to_cores": "2",
+    "default_database": "default",
+    "dictionaries_lazy_load": "1",
+    "keep_alive_timeout": "10",
+    "mark_cache_size": "268435456",
+    "max_concurrent_queries": "1000",
+    "max_server_memory_usage": "3500000000",
+    "max_server_memory_usage_to_ram_ratio": "0.9",
+    "max_thread_pool_size": "10000",
+    "query_condition_cache_size": "106700800",
+    "total_memory_profiler_step": "4194304",
+    "total_memory_tracker_sample_probability": "0",
+    "uncompressed_cache_size": "0",
+    "validate_tcp_client_information": "0",
+    "wait_dictionaries_load_at_startup": "1"
+  },
+  "batch_rows": 500000,
+  "phases_s": {
+    "create_tables": 0.17,
+    "insert": 22.924,
+    "merge_settle": 4.161
+  },
+  "total_load_s": 27.256,
+  "parquet_bytes": 227184209,
+  "compressed_bytes": 393581173,
+  "uncompressed_bytes": 807173341,
+  "tables": {
+    "region": {
+      "rows": 5,
+      "insert_s": 0.034,
+      "total_bytes": 703,
+      "compressed_bytes": 429,
+      "uncompressed_bytes": 432,
+      "pk_bytes": 8,
+      "active_parts": 1
+    },
+    "nation": {
+      "rows": 25,
+      "insert_s": 0.007,
+      "total_bytes": 1947,
+      "compressed_bytes": 1593,
+      "uncompressed_bytes": 2342,
+      "pk_bytes": 8,
+      "active_parts": 1
+    },
+    "supplier": {
+      "rows": 10000,
+      "insert_s": 0.033,
+      "total_bytes": 793750,
+      "compressed_bytes": 793086,
+      "uncompressed_bytes": 1405466,
+      "pk_bytes": 8,
+      "active_parts": 1
+    },
+    "customer": {
+      "rows": 150000,
+      "insert_s": 0.402,
+      "total_bytes": 12505429,
+      "compressed_bytes": 12503582,
+      "uncompressed_bytes": 22734526,
+      "pk_bytes": 80,
+      "active_parts": 1
+    },
+    "part": {
+      "rows": 200000,
+      "insert_s": 0.289,
+      "total_bytes": 7110394,
+      "compressed_bytes": 7108216,
+      "uncompressed_bytes": 13658210,
+      "pk_bytes": 104,
+      "active_parts": 1
+    },
+    "partsupp": {
+      "rows": 800000,
+      "insert_s": 1.737,
+      "total_bytes": 46720246,
+      "compressed_bytes": 46716734,
+      "uncompressed_bytes": 116071429,
+      "pk_bytes": 404,
+      "active_parts": 2
+    },
+    "orders": {
+      "rows": 1500000,
+      "insert_s": 2.209,
+      "total_bytes": 55970243,
+      "compressed_bytes": 55949339,
+      "uncompressed_bytes": 116130005,
+      "pk_bytes": 540,
+      "active_parts": 21
+    },
+    "lineitem": {
+      "rows": 6001215,
+      "insert_s": 18.213,
+      "total_bytes": 270587132,
+      "compressed_bytes": 270508194,
+      "uncompressed_bytes": 537170931,
+      "pk_bytes": 1706,
+      "active_parts": 21
+    }
+  }
+}

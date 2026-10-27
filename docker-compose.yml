@@ -4,6 +4,10 @@
 #   docker compose --profile pg up -d     /  docker compose --profile pg down
 #   docker compose --profile ch up -d     /  docker compose --profile ch down
 
+# Pinned so volumes stay benchmark_pg_data / benchmark_ch_data regardless of
+# the folder name (Compose otherwise derives the project name from the folder)
+name: benchmark
+
 services:
   postgres:
     image: postgres:17
