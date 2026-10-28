@@ -44,17 +44,17 @@ Data is generated with DuckDB's `tpch` extension (`dbgen`) by
 [scripts/gen_tpch.py](scripts/gen_tpch.py) and stored as zstd Parquet in `data/sf<N>/`.
 The scale factor (SF) sets the size: SF 1 is about 1 GB of raw data.
 
-| Table | Rows per SF | SF 1 | SF 3 | SF 10 |
-|---|---|--:|--:|--:|
-| `region` | 5 (fixed) | 5 | 5 | 5 |
-| `nation` | 25 (fixed) | 25 | 25 | 25 |
-| `supplier` | SF × 10,000 | 10,000 | 30,000 | 100,000 |
-| `customer` | SF × 150,000 | 150,000 | 450,000 | 1,500,000 |
-| `part` | SF × 200,000 | 200,000 | 600,000 | 2,000,000 |
-| `partsupp` | SF × 800,000 | 800,000 | 2,400,000 | 8,000,000 |
-| `orders` | SF × 1,500,000 | 1,500,000 | 4,500,000 | 15,000,000 |
-| `lineitem` | ≈ SF × 6,000,000 | 6,001,215 | 17,996,609 | 59,986,052 |
-| **Parquet size** | | 0.23 GB | 0.69 GB | 2.35 GB |
+| Table | Description | Rows per SF | SF 1 | SF 3 | SF 10 |
+|---|---|---|--:|--:|--:|
+| `region` | Geographic regions (Europe, Asia, ...) | 5 (fixed) | 5 | 5 | 5 |
+| `nation` | Countries, each in one region | 25 (fixed) | 25 | 25 | 25 |
+| `supplier` | Suppliers, with their nation and account balance | SF × 10,000 | 10,000 | 30,000 | 100,000 |
+| `customer` | Customers, with their nation, market segment and account balance | SF × 150,000 | 150,000 | 450,000 | 1,500,000 |
+| `part` | Product catalog | SF × 200,000 | 200,000 | 600,000 | 2,000,000 |
+| `partsupp` | Which supplier sells which product, at what cost and available quantity | SF × 800,000 | 800,000 | 2,400,000 | 8,000,000 |
+| `orders` | Order header: customer, date, status, priority and total price | SF × 1,500,000 | 1,500,000 | 4,500,000 | 15,000,000 |
+| `lineitem` | Main fact table: each item of each order (quantity, price, discount, ship/commit/receipt dates) | ≈ SF × 6,000,000 | 6,001,215 | 17,996,609 | 59,986,052 |
+| **Parquet size** | | | 0.23 GB | 0.69 GB | 2.35 GB |
 
 The production system is about 200 GB, roughly SF 200. The laptop can't hold that, so the
 benchmark runs SF 1, 3 and 10 and treats the **trend across scales** as the evidence. SF 10 is
