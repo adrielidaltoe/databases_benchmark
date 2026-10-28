@@ -1,4 +1,8 @@
 -- TPC-H Q8. Source: DuckDB tpch extension (TPC-H validation parameters).
+-- Known difference (kept as a finding, query left as written): ClickHouse Decimal
+-- division keeps the dividend's scale, so mkt_share is truncated to 4 digits
+-- (0.0344 vs Postgres 0.0344358904... at SF1). Within the TPC-H answer tolerance,
+-- but a silent precision loss for financial ratios after a migration.
 SELECT
     o_year,
     sum(
