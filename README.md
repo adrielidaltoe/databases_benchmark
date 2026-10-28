@@ -246,6 +246,36 @@ The speedup is Postgres time ÷ ClickHouse time; above 1 means ClickHouse is fas
 "As written" is the geometric mean over the original queries that completed on both engines.
 "Best version" uses each engine's faster version of each query (original or rewrite).
 
+**Why a geometric mean.** Each query gives one speedup, a ratio, and the geometric mean is the
+standard way to average ratios:
+
+- **Wins and losses count equally.** A query that is 4x faster and one that is 4x slower
+  average to 1.0x. An arithmetic mean would give (4 + 0.25) / 2 = 2.1x, overstating the
+  advantage. Our per-query speedups range from 0.23x to over 2,000x, so this matters a lot.
+- **Every query counts equally**, whether it takes 0.1 s or 10 minutes.
+- **It's the benchmark convention.** TPC-H's own Power metric, and SPEC CPU, use it, which
+  makes the results comparable with how vendor claims are usually calculated.
+
+**How it is calculated:** multiply the per-query speedups, then take the n-th root, where n is
+the number of queries. For example, with three queries from the SF 1 warm results:
+
+| Query | PG warm | CH warm | Speedup (PG ÷ CH) |
+|---|--:|--:|--:|
+| Q1 | 3.828 s | 0.365 s | 10.49x |
+| Q6 | 0.387 s | 0.033 s | 11.73x |
+| Q8 | 0.185 s | 0.792 s | 0.23x (ClickHouse slower) |
+
+1. Multiply the speedups: 10.49 × 11.73 × 0.23 = 28.3
+2. Take the cube root, because there are 3 queries: ∛28.3 = **3.05x**
+
+The geometric mean is the single speedup that, applied to every query, gives the same combined
+effect (3.05 × 3.05 × 3.05 = 28.3). The arithmetic mean of the same three queries,
+(10.49 + 11.73 + 0.23) / 3 = 7.5x, almost ignores the fact that ClickHouse was 4x slower on Q8.
+
+Cold and warm are averaged separately: cold uses each query's single cold run, and warm uses
+each query's median over its 5 warm runs. The table below applies this to every original query
+that completed on both engines (21 of the 22 at SF 1).
+
 | | SF 1 | SF 3 | SF 10 |
 |---|--:|--:|--:|
 | Original queries completed on both engines | 21 of 22 | 21 of 22 | **17 of 22** |
