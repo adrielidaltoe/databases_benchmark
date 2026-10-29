@@ -1,0 +1,25 @@
+q03 default             error          17.20s  anon  2828.0 MB  spill   190.2 MB  cores 1.97  [Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: Query memory limit exceed]
+q03 auto_1g             ok             27.64s  anon  2515.7 MB  spill     0.1 MB  cores 1.38
+q03 grace_hash_1g       ok             22.71s  anon  1843.5 MB  spill   272.8 MB  cores 1.3
+q03 partial_merge       ok             25.91s  anon  2147.4 MB  spill     4.3 MB  cores 1.41
+q03 full_sorting_merge  ok              8.54s  anon  1609.5 MB  spill     3.6 MB  cores 2.76
+q05 default             error           6.60s  anon  3031.4 MB  spill    58.0 MB  cores 2.37  [Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: Query memory limit exceed]
+q05 auto_1g             ok             82.95s  anon  2077.5 MB  spill  1442.1 MB  cores 1.32
+q05 grace_hash_1g       ok             46.32s  anon  1591.5 MB  spill  1017.2 MB  cores 1.2
+q05 partial_merge       ok             82.64s  anon  1918.2 MB  spill  1585.8 MB  cores 1.33
+q05 full_sorting_merge  ok             23.35s  anon  2442.5 MB  spill   675.9 MB  cores 2.85
+q08 default             error           5.00s  anon  2968.1 MB  spill     0.0 MB  cores 2.91  [Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exce]
+q08 auto_1g             DIFF row 0 col 1: 0.0388 vs 0.0388201425143322   72.57s  anon  2992.6 MB  spill  1466.8 MB  cores 1.08
+q08 grace_hash_1g       DIFF row 0 col 1: 0.0388 vs 0.0388201425143322   47.54s  anon  2527.9 MB  spill   950.9 MB  cores 1.18
+q08 partial_merge       DIFF row 0 col 1: 0.0388 vs 0.0388201425143322   62.53s  anon  2199.2 MB  spill  1539.4 MB  cores 1.16
+q08 full_sorting_merge  DIFF row 0 col 1: 0.0388 vs 0.0388201425143322   24.76s  anon  2467.2 MB  spill   628.5 MB  cores 2.82
+q09 default             error           3.60s  anon  3275.2 MB  spill     0.0 MB  cores 2.91  [Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exce]
+q09 auto_1g             error           0.20s  anon  2869.2 MB  spill     0.0 MB  cores 1.27  [Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exce]
+q09 grace_hash_1g       error           0.20s  anon  2835.0 MB  spill     0.0 MB  cores 1.53  [Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exce]
+q09 partial_merge       ok             86.26s  anon  2831.2 MB  spill  2097.6 MB  cores 1.22
+q09 full_sorting_merge  ok             32.55s  anon  2809.4 MB  spill   749.8 MB  cores 2.75
+q21 default             error           4.80s  anon  3294.4 MB  spill     0.0 MB  cores 2.87  [Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exce]
+q21 auto_1g             error          60.30s  anon  2933.8 MB  spill    18.9 MB  cores 1.22  [Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: Query memory limit exceed]
+q21 grace_hash_1g       error          26.00s  anon  2829.6 MB  spill   535.7 MB  cores 1.42  [Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: Query memory limit exceed]
+q21 partial_merge       error         112.80s  anon  2659.5 MB  spill    32.7 MB  cores 2.07  [Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exce]
+q21 full_sorting_merge  error           6.50s  anon  3297.5 MB  spill    24.2 MB  cores 2.94  [Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exce]

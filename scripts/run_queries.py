@@ -1,7 +1,12 @@
-"""Timed TPC-H query benchmark: the 22 standard queries plus the 6 CTE rewrites,
-on one engine at one scale factor.
+"""Timed TPC-H query benchmark: the 22 standard queries plus the 6 CTE rewrites
+(and, on ClickHouse, the per-query tuned versions), on one engine at one scale factor.
 
-Per query (each variant: original, rewritten):
+Variants: original (as written), rewritten (queries/<engine>/rewritten, CTE
+decorrelation, same SQL on both engines), tuned (queries/<engine>/tuned, only
+ClickHouse Q3/Q5/Q8/Q9: the original SQL plus a per-query join_algorithm so they
+fit the memory cap at SF10 - see the README section on ClickHouse join tuning).
+
+Per query (each variant):
   1. cold run  - container stopped, the engine's data files evicted from the OS
                  page cache, container started, then the query runs once
                  (engine buffers + OS cache of the data both empty)
@@ -70,7 +75,7 @@ ALL_QUERIES = [f"q{i:02d}" for i in range(1, 23)]
 
 
 def query_list(engine: str, only: set[str] | None) -> list[tuple[str, str, str]]:
-    """(query, variant, sql) for every original and rewrite, in query order."""
+    """(query, variant, sql) for every original, rewrite and tuned version, in query order."""
     out = []
     for q in ALL_QUERIES:
         if only and q not in only:
@@ -78,6 +83,9 @@ def query_list(engine: str, only: set[str] | None) -> list[tuple[str, str, str]]
         out.append((q, "original", (QUERIES_DIR / engine / f"{q}.sql").read_text()))
         if q in REWRITTEN:
             out.append((q, "rewritten", (QUERIES_DIR / engine / "rewritten" / f"{q}.sql").read_text()))
+        tuned = QUERIES_DIR / engine / "tuned" / f"{q}.sql"
+        if tuned.exists():
+            out.append((q, "tuned", tuned.read_text()))
     return out
 
 
@@ -379,9 +387,12 @@ def latest(engine: str, sf: int) -> dict:
 
 
 def compare_engines(sf: int) -> None:
-    """Check the latest Postgres and ClickHouse runs returned the same results."""
+    """Check the latest Postgres and ClickHouse runs returned the same results.
+    ClickHouse tuned versions are checked against the Postgres original."""
     pg, ch = ({(e["query"], e["variant"]): e for e in latest(eng, sf)["queries"]}
               for eng in ("postgres", "clickhouse"))
+    for (q, v) in [k for k in ch if k[1] == "tuned" and (k[0], "original") in pg]:
+        pg[(q, v)] = pg[(q, "original")]
     for key in sorted(pg.keys() & ch.keys()):
         a, b = pg[key].get("result"), ch[key].get("result")
         label = f"  {key[0]} {key[1]:<9}"

@@ -1,0 +1,28 @@
+== auto (1.5 GB) on all queries (warm: 1 warm-up + 3 runs, median) vs default warm median
+  q01 original     2.63s  default   2.567   1.03x of default  anon   360.1  ok
+  q02 original     1.74s  default   0.882   1.97x of default  anon  1098.0  ok
+  q02 rewritten    2.00s  default   2.012   0.99x of default  anon  1429.3  ok
+  q03 original    29.83s  default       -  default failed  anon  2457.2  ok
+  q04 original     4.43s  default   1.573   2.82x of default  anon  2001.6  ok
+  q04 rewritten    5.00s  default   2.726   1.83x of default  anon  2353.9  ok
+  q05 original    92.76s  default       -  default failed  anon  2683.4  ok
+  q06 original     0.19s  default   0.239   0.79x of default  anon  2100.5  ok
+  q07 original     7.84s  default   5.951   1.32x of default  anon  2380.0  ok
+  q08 original    83.87s  default       -  default failed  anon  2973.8  DIFF row 0 col 1: 0.0388 vs 0.0388201425143322
+  q09 original  ERROR  (total) memory limit exceeded: would use 3.34 GiB (attempt to allocate chunk of 130.07 Mi
+  q10 original    26.68s  default   5.509   4.84x of default  anon  2150.8  ok
+  q11 original     1.07s  default   0.761   1.41x of default  anon   707.6  ok
+  q12 original     0.73s  default   0.587   1.25x of default  anon  1802.1  ok
+  q13 original  ERROR  (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 7.11 MiB 
+  q14 original     0.32s  default   0.157   2.07x of default  anon  2949.2  ok
+  q15 original     0.24s  default   0.197   1.24x of default  anon   780.4  ok
+  q16 original     0.42s  default   0.411   1.03x of default  anon   773.4  ok
+  q17 original     3.85s  default   3.312   1.16x of default  anon  1116.0  ok
+  q17 rewritten    1.58s  default   1.552   1.02x of default  anon   747.2  ok
+  q18 original     4.54s  default   4.158   1.09x of default  anon  1709.5  ok
+  q19 original     1.57s  default   1.395   1.13x of default  anon   960.2  ok
+  q20 original     0.29s  default   0.285   1.02x of default  anon   766.9  ok
+  q20 rewritten    0.43s  default    0.42   1.02x of default  anon   685.4  ok
+  q21 rewritten   21.74s  default  19.027   1.14x of default  anon  1923.1  ok
+  q22 original     0.62s  default   0.542   1.15x of default  anon   849.1  ok
+  q22 rewritten    0.65s  default   0.505   1.29x of default  anon  1130.7  ok
