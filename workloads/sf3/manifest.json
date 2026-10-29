@@ -1,0 +1,89 @@
+{
+  "sf": 3,
+  "seed": 20261029,
+  "runs": 10,
+  "duckdb_version": "2.0.0",
+  "units_per_run": {
+    "insert (orders)": {
+      "insert_batch": 4500,
+      "insert_small": 100
+    },
+    "update (lineitems)": {
+      "update_point": 1,
+      "update_100": 100,
+      "update_1k": 1000,
+      "update_10k": 10000
+    },
+    "delete (orders)": {
+      "delete_point": 1,
+      "delete_100": 100,
+      "delete_1k": 1000
+    },
+    "upsert (lineitems)": {
+      "upsert_1k": 1000
+    }
+  },
+  "new_order_dates": [
+    "1998-07-04",
+    "+30 days"
+  ],
+  "files": {
+    "insert_orders.parquet": {
+      "rows": 46000,
+      "rows_per_scenario": {
+        "insert_batch": 45000,
+        "insert_small": 1000
+      },
+      "bytes": 959887,
+      "sha256": "df4a39764fe873743262a2e429fcd7ecef0f827ab9797a99e31cdcd6ec7f5e03"
+    },
+    "insert_lineitem.parquet": {
+      "rows": 184206,
+      "rows_per_scenario": {
+        "insert_batch": 180191,
+        "insert_small": 4015
+      },
+      "bytes": 3303631,
+      "sha256": "e0201dcc7cc4f4a9a90361dfde2e1fb1796481f48c4e32457a3ea47b627fea5f"
+    },
+    "update_lineitem.parquet": {
+      "rows": 111010,
+      "rows_per_scenario": {
+        "update_100": 1000,
+        "update_10k": 100000,
+        "update_1k": 10000,
+        "update_point": 10
+      },
+      "bytes": 3101278,
+      "sha256": "2202e0f2d15701aecbb0bf6a4a8fc122ac245804719d4d76db5eb11699326076"
+    },
+    "delete_orders.parquet": {
+      "rows": 11010,
+      "rows_per_scenario": {
+        "delete_100": 1000,
+        "delete_1k": 10000,
+        "delete_point": 10
+      },
+      "bytes": 54673,
+      "sha256": "c505aa2f438309c63869fd0ed8e8c819eb3aa8a4fde1ffa4957a44eeb7ed8db3"
+    },
+    "delete_lineitem.parquet": {
+      "rows": 43891,
+      "rows_per_scenario": {
+        "delete_100": 4108,
+        "delete_1k": 39753,
+        "delete_point": 30
+      },
+      "bytes": 117475,
+      "sha256": "6f9ed697a0365a92129ef49339a29e3e0794cea789c16734a25adcc268e858fe"
+    },
+    "upsert_lineitem.parquet": {
+      "rows": 10000,
+      "rows_per_scenario": {
+        "upsert_1k": 10000
+      },
+      "bytes": 297890,
+      "sha256": "4e1126cad3b3554893b12e825c9e1dcbf3e72ca264b4cd7e0efaff7feea5db96"
+    }
+  }
+}
