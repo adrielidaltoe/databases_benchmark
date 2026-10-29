@@ -2,7 +2,13 @@
     <!-- Hard cap for the whole server, below the 4 GB container limit,
          so ClickHouse fails a query cleanly instead of being OOM-killed -->
     <max_server_memory_usage>3500000000</max_server_memory_usage>
- 
+
+    <!-- Reset the server's memory tracker to the real RSS periodically. Without
+         it, memory freed by background merges/mutations stays counted (2+ GB
+         after a few lightweight deletes, with ~1 GB RSS), and ordinary queries
+         then fail on the limit above -->
+    <memory_worker_correct_memory_tracker>1</memory_worker_correct_memory_tracker>
+
     <!-- Defaults assume much more RAM -->
     <mark_cache_size>268435456</mark_cache_size>          <!-- 256 MB -->
     <uncompressed_cache_size>0</uncompressed_cache_size>
