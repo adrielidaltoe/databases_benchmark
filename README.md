@@ -627,3 +627,97 @@ complete numbers are in the per-scale tables above. Times are warm medians.
 runs all 22 reports both correctly and fast. Large joins need per-query tuning (and some need
 rewriting), or each server needs more memory per query. In production that is either an
 operations cost or a hardware cost, and it should go into the TCO comparison.
+
+## 6. Write workload: late corrections, inserts and upserts
+
+The brief calls out late-arriving financial corrections as a known weakness of columnar
+engines, so the benchmark also measures writes. The 22 TPC-H queries are read-only. TPC-H's own
+refresh functions (RF1 inserts new orders, RF2 deletes old ones) have no UPDATE and no upsert.
+They also aren't in the DuckDB `tpch` extension. So the write workload is generated here.
+
+### Generated once, committed to the repository
+
+[scripts/gen_workload.py](scripts/gen_workload.py) reads `data/sf<N>/` and writes the changes
+to `workloads/sf<N>/` as zstd Parquet, together with a `manifest.json`. Unlike `data/`, this
+folder is committed, so:
+
+- **both engines apply exactly the same changes**, row for row
+- **the workload is fixed and reviewable**: the files say exactly what each run changes, and
+  the manifest records the seed, the number of rows per scenario, and a SHA-256 for each file
+- **nothing is generated at benchmark time**
+
+```bash
+python scripts/gen_workload.py --sf 1   # also --sf 3, --sf 10 (needs data/sf<N>/ first)
+```
+
+Every random choice is a hash of the row key, a purpose label and a fixed seed
+(`hash(key, 'discount', SEED)`), not a stateful random generator. The output doesn't depend on
+thread count or row order, and rerunning the script produces byte-identical files.
+
+### Scenarios
+
+Each scenario has **10 runs**. A run is one unit of work, applied and timed as one
+measurement. Runs never overlap: each row is updated, deleted or upserted in at most one run of
+one scenario, and corrections never touch an order that a delete removes. So the runs can be
+applied one after the other without affecting each other.
+
+| Scenario | Unit per run | Models |
+|---|---|---|
+| `insert_batch` | SF × 1,500 orders, with their lines (0.1% of `orders`, the TPC-H RF1 size) | The daily load, as one statement |
+| `insert_small` | 100 orders, to be sent one order per statement | A trickle of transactions; ClickHouse creates a part per insert |
+| `update_point` | 1 lineitem | A single late correction |
+| `update_100` / `update_1k` / `update_10k` | 100 / 1,000 / 10,000 lineitems, scattered across all 7 years | A correction batch |
+| `delete_point` / `delete_100` / `delete_1k` | 1 / 100 / 1,000 orders and all their lines | Reversals and cancellations |
+| `upsert_1k` | 1,000 lineitems: 500 corrections of existing lines, 500 new lines | A late feed that mixes corrections and new data (MERGE) |
+
+### Files
+
+| File | Contents | SF 1 rows | SF 3 rows | SF 10 rows |
+|---|---|--:|--:|--:|
+| `insert_orders.parquet` | Full `orders` rows | 16,000 | 46,000 | 151,000 |
+| `insert_lineitem.parquet` | Full `lineitem` rows of the new orders | 64,127 | 184,206 | 603,600 |
+| `update_lineitem.parquet` | Full `lineitem` rows **after** the correction, plus `correction_type` | 111,010 | 111,010 | 111,010 |
+| `delete_orders.parquet` | `o_orderkey`, `o_orderdate` | 11,010 | 11,010 | 11,010 |
+| `delete_lineitem.parquet` | `l_orderkey`, `l_linenumber`, `l_shipdate` of the deleted orders' lines | 43,842 | 43,891 | 44,066 |
+| `upsert_lineitem.parquet` | Full `lineitem` rows, plus `is_new` and `correction_type` | 10,000 | 10,000 | 10,000 |
+| **Folder size** | | 4.8 MB | 7.5 MB | 17 MB |
+
+Every file starts with `scenario` and `run_id`, and the other columns have the same names and
+types as the TPC-H tables. Updates and upserts store the **full row**, not only the changed
+columns. Postgres and a ClickHouse `UPDATE` use only the changed columns. A ReplacingMergeTree
+table needs the whole new row version. Deletes store the date column of the sort key, because
+a ReplacingMergeTree "delete" is an insert of a tombstone row with the same key.
+
+### How the rows are built
+
+- **Corrections** change exactly one money column per line: the discount (0.00–0.10), the tax
+  (0.00–0.08) or the quantity (1–50). A quantity change also rescales `l_extendedprice`, which
+  TPC-H defines as quantity × the part's retail price. The new value always differs from the old
+  one. The sort key columns (`l_shipdate`, `l_orderkey`, `l_linenumber`) never change, so a
+  corrected row keeps its key and partition on ClickHouse.
+- **New orders** use the order keys that `dbgen` leaves unused. It only uses keys with
+  `key % 32` in 0–7, and TPC-H RF1 fills the same gaps. Customer, clerk, priority, line count,
+  part, supplier, price, discount, tax, dates, flags, ship mode and instructions follow the
+  formulas in TPC-H spec section 4.2.3. The supplier and retail price formulas were checked
+  against the generated data. `o_totalprice` and `o_orderstatus` are derived from the new lines.
+  Comments are sampled from a pool of 10,000 real comments.
+- **New order dates fall in the last 30 days of the TPC-H range** (1998-07-04 to 1998-08-02),
+  which models a daily load. This differs from RF1, which spreads new orders over all 7 years.
+  As a result, every new line lands in the 1998 partition on ClickHouse. A single INSERT into a
+  single partition is atomic there.
+- **New lines in upserts** are added to existing orders that have fewer than 7 lines, with the
+  next line number. They model a line that arrives after its order was loaded.
+
+### Simplifications
+
+- **`o_totalprice` isn't recomputed** when a correction or a new upsert line changes an order's
+  lines. The workload only changes `lineitem`. Keeping the order total in step would be a
+  two-table change, which ClickHouse can't apply atomically. That is part of the atomicity risk
+  covered in the write benchmark.
+- **Bulk restatements** (for example, re-pricing every line of one year) are defined as a SQL
+  rule in the write benchmark, not stored as rows. At SF 10 one year is about 9 million lines.
+- **ClickHouse mutations (`ALTER TABLE … UPDATE/DELETE`) aren't tested.** They rewrite whole
+  parts in the background and are meant for occasional large-scale changes, not for routine
+  corrections. ClickHouse is tested with lightweight `UPDATE` and `DELETE`, with
+  ReplacingMergeTree (insert a new version or a tombstone), and with `REPLACE PARTITION` for
+  bulk restatements.
