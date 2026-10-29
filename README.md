@@ -721,3 +721,115 @@ a ReplacingMergeTree "delete" is an insert of a tombstone row with the same key.
   corrections. ClickHouse is tested with lightweight `UPDATE` and `DELETE`, with
   ReplacingMergeTree (insert a new version or a tombstone), and with `REPLACE PARTITION` for
   bulk restatements.
+
+## 7. Write benchmark
+
+[scripts/run_writes.py](scripts/run_writes.py) applies the workload from section 6 to one
+engine and measures every run.
+
+```bash
+python scripts/run_writes.py --engine postgres --sf 1
+python scripts/run_writes.py --engine clickhouse --sf 1          # both ClickHouse methods
+python scripts/run_writes.py --engine clickhouse --sf 1 --method replacing --runs 2  # smoke test
+python scripts/run_writes.py --compare --sf 1                    # final table checksums
+```
+
+### Methods
+
+Each method applies the same changes in the way that engine is normally used.
+
+| Scenario | Postgres | ClickHouse `lightweight` (MergeTree) | ClickHouse `replacing` (ReplacingMergeTree) |
+|---|---|---|---|
+| Inserts | `COPY` (batch) or `INSERT` (one order per transaction) | `INSERT` | `INSERT` with a new `_version` |
+| Updates | `UPDATE … FROM (VALUES …)` | Lightweight `UPDATE`, one statement per batch | `INSERT` of the new row version |
+| Deletes | `DELETE` lines and orders in one transaction | Lightweight `DELETE`, one statement per table | `INSERT` of tombstones (`_is_deleted = 1`) |
+| Upsert | `MERGE` | `DELETE` the keys, then `INSERT` all rows (no MERGE in ClickHouse) | `INSERT` |
+| Restatement | `UPDATE … WHERE` the year | Rebuild the year in a staging table, then `REPLACE PARTITION` | Same, reading with `FINAL` |
+| Reads (Q1, Q6) | as is | as is | `final = 1` |
+
+**Restatement** is the bulk case: every line shipped in 1993, 1994 or 1995 (one year per run)
+gets a tax rate one point higher, about 9 million lines per year at SF 10.
+
+Each Postgres run is one transaction, so it is atomic. On ClickHouse, a run that touches two
+tables, or deletes and then inserts, is several separate statements. A reader can see it half
+applied, which is the atomicity gap discussed for the risk assessment.
+
+### Isolation from the read benchmark
+
+The writes go to copies of `orders` and `lineitem` that are rebuilt at the start of every
+invocation: Postgres schema `w_sf<N>`, ClickHouse databases `w_sf<N>_lw` and `w_sf<N>_rmt`. The
+`sf<N>` data used by the read benchmark is never changed.
+
+- The Postgres copy gets the same primary keys and indexes as the original, a
+  `VACUUM (ANALYZE)` and a checkpoint. **Autovacuum is off on the copies**, so maintenance runs
+  only when the benchmark asks for it and its cost is measured, not mixed into random runs.
+- The ClickHouse `lightweight` copy is created with `enable_block_number_column` and
+  `enable_block_offset_column`. Lightweight UPDATE needs them, and they can only be set when a
+  table is created. **Adopting lightweight updates means rebuilding the table**, as does
+  switching to ReplacingMergeTree. The `replacing` copy adds `_version UInt64` and
+  `_is_deleted UInt8` columns. The sort key and partitioning are unchanged.
+
+### Phases and metrics
+
+1. **Setup**: build the copies.
+2. **Baseline reads**: Q1 and Q6, one warm-up run and then 5 timed runs.
+3. **Scenarios**: the 10 runs of each scenario (3 for the restatement), in the order of
+   section 6. After each scenario the engine **settles**:
+   - Postgres runs `CHECKPOINT`, which writes the dirty data pages to disk.
+   - ClickHouse waits until no merges or mutations have run for 3 seconds.
+
+   The settle step's time, CPU and bytes written are the background cost the scenario left
+   behind, reported apart from the runs themselves.
+4. **Reads after writes**: Q1 and Q6 again, before any cleanup. This shows the read penalty of
+   dead rows, delete masks, patch parts and `FINAL`.
+5. **Cleanup**:
+   - Postgres: `VACUUM (ANALYZE)` and `CHECKPOINT`.
+   - ClickHouse: `OPTIMIZE TABLE … FINAL`, which applies masks, patches and tombstones.
+6. **Reads after cleanup**.
+
+Per run:
+- **Time**: median, p95 and minimum of the client-side wall time of all statements in the run.
+- **Resources**: CPU time, average busy cores, peak memory (total and working) and disk bytes
+  read and written. These come from the container's cgroup, as in the read benchmark.
+- **Engine counters**:
+  - Postgres: rows read, inserted, updated, HOT-updated and deleted, and buffer bytes accessed
+    (`pg_stat_*` deltas).
+  - ClickHouse: rows and bytes read and written (`system.query_log`).
+- **Storage** after each scenario and after cleanup:
+  - Postgres: table and index size, live and dead rows.
+  - ClickHouse: bytes on disk, active parts, patch parts.
+
+Errors and timeouts (30 min) are recorded as results, as in the read benchmark.
+
+**Correctness check:** the script takes a checksum of both tables after the writes and after
+the cleanup: row counts, plus the sums of quantity, price, discount, tax and order total.
+`--compare` checks that every method ended with the same data. At SF 1, all three methods
+match.
+
+Results go to `results/writes_<engine>_<method>_sf<N>_<ts>.json` (every run) and
+`results/writes.csv` (one line per scenario, cleanup and read phase).
+
+### Pitfalls found while building it
+
+These are worth knowing for any migration:
+
+- **Decimal arithmetic with a bare literal silently loses money on ClickHouse.** `0.01` is a
+  Float64 there, so `l_tax + 0.01` is computed in floating point. When the result is stored back
+  into a `Decimal(15,2)` column it is **truncated**: 0.06 + 0.01 = 0.0699… becomes 0.06. The
+  first version of the restatement left about 200,000 of the 1.8 million restated lines (SF 1,
+  2 runs) at their old tax rate, with no error. Postgres
+  treats `0.01` as an exact numeric. The fix is an explicit decimal, `toDecimal32('0.01', 2)`.
+  **Every migrated report and correction script that does decimal arithmetic needs this
+  review.**
+- **ReplacingMergeTree tombstones survive `OPTIMIZE … FINAL`.** A deleted row's tombstone stays
+  in the table after the merge, and a read without `FINAL` counts it. So `final = 1` is needed
+  for good, not just until merges catch up. Removing tombstones needs `OPTIMIZE … FINAL CLEANUP`,
+  which is behind an experimental setting.
+- **ClickHouse UPDATE has no `FROM` or join.** A batch of row-specific corrections is written as
+  one statement that maps each row key to its new value with `transform()`. A 10,000-row batch
+  needed higher parser limits (`max_query_size`, `max_ast_elements`).
+- **The shared memory limit shows up here too.** In one smoke-test run, Q1 with `final = 1`
+  failed on the 3.5 GB server-wide limit while using 160 MiB itself, right after the
+  ReplacingMergeTree copy was built.
+
+Results for SF 1, 3 and 10 will be added here.
