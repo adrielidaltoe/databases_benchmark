@@ -101,6 +101,8 @@ every setting is saved with each result file.
   - `LowCardinality` columns for low-cardinality strings
   - `max_threads=3`, `max_memory_usage=3 GB` per query, `max_server_memory_usage=3.5 GB`,
     external GROUP BY and sort above 1.5 GB, `max_execution_time=1800 s`, query cache off
+  - `memory_worker_correct_memory_tracker=1`, added for the write benchmark, so the server's
+    memory count follows the real RSS (see [section 7](#7-write-benchmark))
   - The **join algorithm is left at the default** (in-memory hash join) in the profile. At SF 10
     four queries run out of memory with it; they get a per-query setting instead, as a separate
     "tuned" version (see [section 5](#5-clickhouse-join-tuning)).
@@ -721,3 +723,254 @@ a ReplacingMergeTree "delete" is an insert of a tombstone row with the same key.
   corrections. ClickHouse is tested with lightweight `UPDATE` and `DELETE`, with
   ReplacingMergeTree (insert a new version or a tombstone), and with `REPLACE PARTITION` for
   bulk restatements.
+
+## 7. Write benchmark
+
+[scripts/run_writes.py](scripts/run_writes.py) applies the workload from section 6 to one
+engine and measures every run.
+
+```bash
+python scripts/run_writes.py --engine postgres --sf 1
+python scripts/run_writes.py --engine clickhouse --sf 1          # both ClickHouse methods
+python scripts/run_writes.py --engine clickhouse --sf 1 --method replacing --runs 2  # smoke test
+python scripts/run_writes.py --compare --sf 1                    # final table checksums
+```
+
+### Methods
+
+Each method applies the same changes in the way that engine is normally used.
+
+| Scenario | Postgres | ClickHouse `lightweight` (MergeTree) | ClickHouse `replacing` (ReplacingMergeTree) |
+|---|---|---|---|
+| Inserts | `COPY` (batch) or `INSERT` (one order per transaction) | `INSERT` | `INSERT` with a new `_version` |
+| Updates | `UPDATE … FROM (VALUES …)` | Lightweight `UPDATE`, one statement per batch | `INSERT` of the new row version |
+| Deletes | `DELETE` lines and orders in one transaction | Lightweight `DELETE`, one statement per table | `INSERT` of tombstones (`_is_deleted = 1`) |
+| Upsert | `MERGE` | `DELETE` the keys, then `INSERT` all rows (no MERGE in ClickHouse) | `INSERT` |
+| Restatement | `UPDATE … WHERE` the year | Rebuild the year in a staging table, then `REPLACE PARTITION` | Same, reading with `FINAL` |
+| Reads (Q1, Q6) | as is | as is | `final = 1` |
+
+**Restatement** is the bulk case: every line shipped in 1993, 1994 or 1995 (one year per run)
+gets a tax rate one point higher, about 9 million lines per year at SF 10.
+
+Each Postgres run is one transaction, so it is atomic. On ClickHouse, a run that touches two
+tables, or deletes and then inserts, is several separate statements. A reader can see it half
+applied, which is the atomicity gap discussed for the risk assessment.
+
+### Isolation from the read benchmark
+
+The writes go to copies of `orders` and `lineitem` that are rebuilt at the start of every
+invocation: Postgres schema `w_sf<N>`, ClickHouse databases `w_sf<N>_lw` and `w_sf<N>_rmt`. The
+`sf<N>` data used by the read benchmark is never changed.
+
+- The Postgres copy gets the same primary keys and indexes as the original, a
+  `VACUUM (ANALYZE)` and a checkpoint. **Autovacuum is off on the copies**, so maintenance runs
+  only when the benchmark asks for it and its cost is measured, not mixed into random runs.
+- The ClickHouse `lightweight` copy is created with `enable_block_number_column` and
+  `enable_block_offset_column`. Lightweight UPDATE needs them, and they can only be set when a
+  table is created. **Adopting lightweight updates means rebuilding the table**, as does
+  switching to ReplacingMergeTree. The `replacing` copy adds `_version UInt64` and
+  `_is_deleted UInt8` columns. The sort key and partitioning are unchanged.
+
+### Phases and metrics
+
+1. **Setup**: build the copies.
+2. **Baseline reads**: Q1 and Q6, one warm-up run and then 5 timed runs.
+3. **Scenarios**: the 10 runs of each scenario (3 for the restatement), in the order of
+   section 6. After each scenario the engine **settles**:
+   - Postgres runs `CHECKPOINT`, which writes the dirty data pages to disk.
+   - ClickHouse waits until no merges or mutations have run for 3 seconds.
+
+   The settle step's time, CPU and bytes written are the background cost the scenario left
+   behind, reported apart from the runs themselves.
+4. **Reads after writes**: Q1 and Q6 again, before any cleanup. This shows the read penalty of
+   dead rows, delete masks, patch parts and `FINAL`.
+5. **Cleanup**:
+   - Postgres: `VACUUM (ANALYZE)` and `CHECKPOINT`.
+   - ClickHouse: `OPTIMIZE TABLE … FINAL`, which applies masks, patches and tombstones.
+6. **Reads after cleanup**.
+
+Per run:
+- **Time**: median, p95 and minimum of the client-side wall time of all statements in the run.
+- **Resources**: CPU time, average busy cores, peak memory (total and working) and disk bytes
+  read and written. These come from the container's cgroup, as in the read benchmark.
+- **Engine counters**:
+  - Postgres: rows read, inserted, updated, HOT-updated and deleted, and buffer bytes accessed
+    (`pg_stat_*` deltas).
+  - ClickHouse: rows and bytes read and written (`system.query_log`).
+- **Storage** after each scenario and after cleanup:
+  - Postgres: table and index size, live and dead rows.
+  - ClickHouse: bytes on disk, active parts, patch parts.
+
+Errors and timeouts (30 min) are recorded as results, as in the read benchmark.
+
+**Correctness check:** the script takes a checksum of both tables after the writes and after
+the cleanup: row counts, plus the sums of quantity, price, discount, tax and order total.
+`--compare` checks that every method ended with the same data. At SF 1, all three methods
+match.
+
+Results go to `results/writes_<engine>_<method>_sf<N>_<ts>.json` (every run) and
+`results/writes.csv` (one line per scenario, cleanup and read phase).
+
+### Pitfalls found while building it
+
+These are worth knowing for any migration:
+
+- **Decimal arithmetic with a bare literal silently loses money on ClickHouse.** `0.01` is a
+  Float64 there, so `l_tax + 0.01` is computed in floating point. When the result is stored back
+  into a `Decimal(15,2)` column it is **truncated**: 0.06 + 0.01 = 0.0699… becomes 0.06. The
+  first version of the restatement left about 200,000 of the 1.8 million restated lines (SF 1,
+  2 runs) at their old tax rate, with no error. Postgres
+  treats `0.01` as an exact numeric. The fix is an explicit decimal, `toDecimal32('0.01', 2)`.
+  **Every migrated report and correction script that does decimal arithmetic needs this
+  review.**
+- **ReplacingMergeTree tombstones survive `OPTIMIZE … FINAL`.** A deleted row's tombstone stays
+  in the table after the merge, and a read without `FINAL` counts it. So `final = 1` is needed
+  for good, not just until merges catch up. Removing tombstones needs `OPTIMIZE … FINAL CLEANUP`,
+  which is behind an experimental setting.
+- **ClickHouse UPDATE has no `FROM` or join.** A batch of row-specific corrections is written as
+  one statement that maps each row key to its new value with `transform()`. A 10,000-row batch
+  needed higher parser limits (`max_query_size`, `max_ast_elements`).
+- **ClickHouse's memory accounting drifted until ordinary statements failed.** The first full
+  run failed at every scale, and every error was the 3.5 GB server-wide memory limit:
+  - Even a one-order insert, a one-row delete and copying the tables at setup failed.
+  - At the time of each error, the server's real memory use (RSS) was only 1.0–1.7 GB.
+  - The cause: ClickHouse kept counting memory that background merges and mutations had
+    already freed. On an idle server with nothing merging, it still charged 2.07 GiB to merges,
+    and lightweight DELETE starts a mutation on every part, so the drift grew quickly.
+
+  The fix is the server setting `memory_worker_correct_memory_tracker = 1`, now in
+  [clickhouse/config.d/memory.xml](clickhouse/config.d/memory.xml). It periodically resets the
+  count to the real RSS. All ClickHouse results below were run with it, with no failures.
+  - **Effect on the read benchmark:** none of its results depend on the drift. Its SF 10 memory
+    failures (Q3, Q5, Q8, Q9, Q21) all hit the per-query 3 GB limit in the first SF 10 run.
+  - **For the risk assessment:** with the default configuration, a memory-capped ClickHouse
+    stopped accepting writes under a correction workload. That is the kind of setting an
+    operations team only finds in production.
+
+### Results
+
+All three methods ended every scale with identical data (`--compare`):
+- **SF 1 and SF 3:** the checksums match exactly.
+- **SF 10:** the two ClickHouse methods match each other. Postgres differs only in the tax
+  total, by exactly the restatement that timed out and was rolled back.
+
+Times are client-side medians, with the p95 in parentheses, over 10 runs (3 for the
+restatement). Raw data: `results/writes_*.json` and `results/writes.csv`.
+
+#### SF 10: time per run
+
+| Scenario | Postgres | ClickHouse lightweight | ClickHouse replacing |
+|---|--:|--:|--:|
+| `insert_batch` (15,000 orders, ~60,000 lines) | 36.0 s (79.0) | **0.20 s** (0.52) | 0.30 s (0.63) |
+| `insert_small` (100 orders, one per statement) | **0.71 s** (0.80) | 1.29 s (3.33) | 1.39 s (1.89) |
+| `update_point` (1 line) | **0.007 s** (0.012) | 0.045 s (0.149) | 0.032 s (0.098) |
+| `update_100` | 0.21 s (0.25) | 0.21 s (0.33) | **0.10 s** (0.29) |
+| `update_1k` | 1.55 s (1.70) | 1.15 s (1.38) | **0.055 s** (0.12) |
+| `update_10k` | 17.0 s (23.5) | 23.1 s (23.5) | **0.11 s** (0.20) |
+| `delete_point` (1 order) | **0.006 s** (0.008) | 0.92 s (6.09) | 0.055 s (0.11) |
+| `delete_100` | **0.21 s** (0.28) | 4.43 s (5.29) | 0.24 s (0.37) |
+| `delete_1k` | 1.67 s (1.90) | 19.3 s (20.0) | **0.21 s** (0.39) |
+| `upsert_1k` | 1.37 s (1.56) | 6.03 s (6.71) | **0.10 s** (0.23) |
+| `restatement` (9.1 million lines) | **timeout** ×3 (> 30 min) | **13.9 s** (20.6) | 21.4 s (24.1) |
+
+#### SF 10: CPU per scenario
+
+Total container CPU time for the 10 runs (3 for the restatement), plus the background work left
+behind (checkpoint or merges):
+
+| Scenario | Postgres | ClickHouse lightweight | ClickHouse replacing |
+|---|--:|--:|--:|
+| `insert_batch` | 134 s | 11 s | 11 s |
+| `insert_small` | 2 s | 22 s | 24 s |
+| `update_point` / `update_100` / `update_1k` / `update_10k` | 0 / 1 / 7 / 66 s | 3 / 7 / 33 / **655 s** | 3 / 5 / 4 / 6 s |
+| `delete_point` / `delete_100` / `delete_1k` | 0 / 1 / 7 s | 35 / 115 / **535 s** | 4 / 9 / 9 s |
+| `upsert_1k` | 6 s | 173 s | 5 s |
+| `restatement` | 2,160 s (3 timeouts) | 75 s | 94 s |
+
+Disk writes are only comparable on Postgres. Its settle step is a `CHECKPOINT`, so everything is
+on disk when it is measured. ClickHouse doesn't fsync new parts by default, so the kernel writes
+them back later, often outside the measured window. On Postgres at SF 10:
+- `update_10k` wrote 4.7 GB: WAL, heap and index pages, about 47 KB per updated line.
+- The three restatement attempts wrote **200 GB**, and all of it was rolled back.
+
+#### How the time grows with scale (medians)
+
+| Scenario | Postgres SF 1 → 3 → 10 | ClickHouse lightweight | ClickHouse replacing |
+|---|---|---|---|
+| `insert_batch` | 0.61 → 2.63 → 36.0 s | 0.07 → 0.07 → 0.20 s | 0.05 → 0.13 → 0.30 s |
+| `update_10k` | 2.36 → 7.12 → 17.0 s | 4.52 → 9.95 → 23.1 s | 0.12 → 0.07 → 0.11 s |
+| `delete_point` | 0.005 → 0.006 → 0.006 s | 0.27 → 0.27 → 0.92 s | 0.04 → 0.04 → 0.06 s |
+| `delete_1k` | 0.49 → 1.31 → 1.67 s | 9.53 → 11.9 → 19.3 s | 0.15 → 0.16 → 0.21 s |
+| `upsert_1k` | 0.32 → 0.66 → 1.37 s | 3.14 → 3.70 → 6.03 s | 0.09 → 0.09 → 0.10 s |
+| `restatement` (one year) | 28.8 → 236 → timeout | 0.82 → 3.04 → 13.9 s | 1.22 → 4.10 → 21.4 s |
+
+The `insert_batch` and `restatement` units grow with the scale factor. The other scenarios
+change the same number of rows at every scale, so their growth is the cost of the table size
+alone.
+
+#### SF 10: reads and maintenance
+
+| | Postgres | ClickHouse lightweight | ClickHouse replacing |
+|---|--:|--:|--:|
+| Q1: baseline → after writes → after cleanup | 36.4 → 49.5 → 40.1 s | 2.77 → 3.19 → 2.99 s | 5.56 → 5.99 → 6.53 s |
+| Q6: baseline → after writes → after cleanup | 88.4 → 126 → 106 s | 0.36 → 0.26 → 0.37 s | 0.80 → 0.72 → 0.81 s |
+| Size: copy → after writes → after cleanup | 14.3 → 19.6 → 17.0 GB | 3.34 → 3.38 → 3.36 GB | 3.34 → 3.37 → 3.35 GB |
+| Cleanup | VACUUM + CHECKPOINT: 466 s, 21.8 GB written | OPTIMIZE FINAL: 87 s | OPTIMIZE FINAL: 125 s |
+
+Notes:
+- On Postgres, the dead rows (19.6 million) come mostly from the restatement attempts that
+  timed out: a rolled-back UPDATE still leaves its new row versions behind as dead rows.
+- VACUUM makes their space reusable but doesn't shrink the files. After the cleanup, the indexes
+  are still 6.4 GB instead of 3.9 GB, and Q1 and Q6 stay 10–20% slower than the baseline.
+- The ClickHouse Q6 times are under a second and vary by ±0.1 s between phases. Those
+  differences are noise.
+
+### Key findings (writes)
+
+1. **Postgres is the clear winner for single corrections.**
+   - A one-line update takes 7 ms and a one-order delete 6 ms, at every scale.
+   - Small batches (100 rows) take about 0.2 s.
+   - Each run is one atomic transaction.
+2. **ClickHouse lightweight DELETE and UPDATE cost scales with the table size, not with the
+   batch.**
+   - At SF 10, deleting a single order takes 0.9 s median and 6.1 s p95.
+   - Deleting 1,000 orders takes 19 s and 53 s of CPU per run, with all three cores busy. A
+     lightweight delete starts a mutation on every part of the table, and each part has to check
+     the condition.
+   - A 10,000-line update takes 23 s and 66 s of CPU per run.
+   - They grew 2–5x from SF 1 to SF 10. **At 200 GB (about 20 times SF 10), a steady stream of
+     corrections would take a large share of the server's CPU.** This method is a poor fit for
+     frequent corrections.
+3. **ReplacingMergeTree makes every correction cheap, and moves the cost to reads.**
+   - Every update, delete and upsert takes 0.03–0.3 s, at every scale.
+   - The price is `FINAL` on every read: Q1 takes 5.6 s instead of 2.8 s, and Q6 0.8 s instead
+     of 0.36 s. That is still 6.5x faster than Postgres for Q1.
+   - The other costs are covered in section 6: `final = 1` is needed permanently, tombstones
+     stay, and a correction that changes the sort key would duplicate the row.
+4. **Bulk restatements reverse the picture.**
+   - Postgres can't restate one year of data at SF 10 within 30 minutes. The time went from 29 s
+     at SF 1 to 236 s at SF 3, and all three SF 10 attempts timed out. They wrote 200 GB, then
+     rolled back. Their dead rows grew the table by 5.3 GB, and 2.7 GB of that stayed after
+     VACUUM.
+   - ClickHouse rebuilds the year in a staging table and swaps it in with `REPLACE PARTITION` in
+     14–21 s. **That operation is atomic**, so readers never see a half-restated year.
+5. **Batch loads strongly favour ClickHouse.**
+   - The daily-load scenario (15,000 orders, ~60,000 lines) takes 0.2–0.3 s on ClickHouse.
+   - On Postgres it takes 36 s (p95 79 s), because every line updates four indexes on a table
+     that no longer fits in memory.
+   - Inserting one order per statement is fine on both: about 7 ms per order on Postgres and
+     13 ms on ClickHouse. But ClickHouse creates two parts per order, so a high-rate trickle
+     needs `async_insert`.
+6. **Maintenance is part of the cost on both engines.**
+   - Postgres needs VACUUM: 466 s at SF 10 here. Without it, reads slow down (Q1 +36% after the
+     writes) and the table grows (14.3 → 19.6 GB).
+   - ClickHouse merges in the background. Its storage barely changed, and `OPTIMIZE FINAL` took
+     87–125 s.
+
+**For the risk assessment:**
+- **A columnar migration only works with a deliberate correction design:** ReplacingMergeTree,
+  `final = 1` enforced for every reader, and `REPLACE PARTITION` for restatements.
+- **The lightweight DELETE and UPDATE that look like a drop-in replacement for SQL UPDATE are the
+  slowest option**, and their cost grows with the data.
+- **The atomicity gap** (section 6) and **the memory-tracker failure** above both need mitigation
+  before go-live.
