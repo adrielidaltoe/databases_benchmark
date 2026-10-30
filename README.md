@@ -320,7 +320,8 @@ best version at every scale.
    is spent waiting for the disk), while ClickHouse keeps all 3 busy and reads about **20x
    less data**. The production system (~200 GB, a 6–8 h reporting window) is far past this
    point, so the trend **supports the 10x claim**: 22.8x warm at SF 10 as written, and still
-   15.6x once the four tuned joins are counted.
+   15.6x once the four tuned joins are counted. With ReplacingMergeTree, which corrections
+   require (sections 7 and 8), the warm speedup drops to 10.9x and 8.6x.
 2. **The win comes from bytes, not rows.** ClickHouse often reads *more* rows than Postgres,
    because it has no row-level indexes and scans whole column ranges. But it reads far fewer
    bytes: only the columns a query needs, compressed. On a cold Q6 at SF 1, ClickHouse read
@@ -943,8 +944,10 @@ Notes:
      frequent corrections.
 3. **ReplacingMergeTree makes every correction cheap, and moves the cost to reads.**
    - Every update, delete and upsert takes 0.03–0.3 s, at every scale.
-   - The price is `FINAL` on every read: Q1 takes 5.6 s instead of 2.8 s, and Q6 0.8 s instead
-     of 0.36 s. That is still 6.5x faster than Postgres for Q1.
+   - **It is the most efficient method for writes, but the cost is slower reads.** Every read
+     needs `FINAL`: Q1 takes 5.6 s instead of 2.8 s, and Q6 0.8 s instead of 0.36 s. That is
+     still 6.5x faster than Postgres for Q1. Section 8 measures all 22 queries: reads are about
+     1.8x slower on average.
    - The other costs are covered in section 6: `final = 1` is needed permanently, tombstones
      stay, and a correction that changes the sort key would duplicate the row.
 4. **Bulk restatements reverse the picture.**
@@ -969,8 +972,120 @@ Notes:
 
 **For the risk assessment:**
 - **A columnar migration only works with a deliberate correction design:** ReplacingMergeTree,
-  `final = 1` enforced for every reader, and `REPLACE PARTITION` for restatements.
+  `final = 1` set in the readers' settings profile
+  ([clickhouse/users.d/profile.xml](clickhouse/users.d/profile.xml)), and `REPLACE PARTITION`
+  for restatements.
 - **The lightweight DELETE and UPDATE that look like a drop-in replacement for SQL UPDATE are the
   slowest option**, and their cost grows with the data.
 - **The atomicity gap** (section 6) and **the memory-tracker failure** above both need mitigation
   before go-live.
+
+## 8. Read cost of ReplacingMergeTree
+
+Section 7 recommends ReplacingMergeTree for corrections and measured its read cost only on Q1
+and Q6. This section reruns the whole SF 10 read benchmark (section 4) on ReplacingMergeTree,
+read with `final = 1`, so the speedup over Postgres can be restated for the design that would
+actually go to production.
+
+```bash
+python scripts/run_queries.py --engine clickhouse --sf 10 --table-engine replacing
+python scripts/run_queries.py --compare --sf 10 --table-engine replacing   # vs Postgres
+```
+
+### Setup
+
+- **Tables:** all 8 tables are rebuilt as `ReplacingMergeTree(_version, _is_deleted)` in the
+  database `sf10_rmt`, from the `sf10` data, with the same columns, partitions and `ORDER BY` as
+  section 2 (the `ORDER BY` key is unique per row on every table). The writes benchmark
+  converted only `orders` and `lineitem`. Here the reference tables are converted too, because
+  they also receive corrections in production. The build takes 201 s, then the script waits for
+  background merges as the loader does.
+- **Reads:** every query runs with `final = 1`. The data is fresh: version 0, nothing deleted,
+  so all results match Postgres (`--compare`), and the cost measured is `FINAL` itself.
+- **Method:** identical to section 4: one cold run after a restart with the data evicted from
+  the page cache, then 5 warm runs, with the same server and memory settings.
+- **Raw data:** `results/queries_clickhouse_rmt_sf10_20261030T144718Z.json`, saved as engine `clickhouse_rmt` in `results/queries.csv`.
+
+### Results (SF 10)
+
+The speedup is Postgres time ÷ ClickHouse time, computed exactly as in section 4. The same
+code reproduces section 4's MergeTree figures.
+
+| Speedup over Postgres | MergeTree (section 4) | ReplacingMergeTree + `FINAL` |
+|---|--:|--:|
+| Cold, as written (17 of 22) | 28.8x | **17.1x** |
+| Warm, as written (17 of 22) | 22.8x | **10.9x** |
+| Cold / warm with the tuned Q3, Q5, Q8, Q9 (21 of 22) | 19.5x / 15.6x | **12.5x / 8.6x** |
+| Total cold time, best version (Postgres: 2,020 s) | 168 s | 248 s |
+| Total warm time, best version (Postgres: 1,722 s) | 152 s | 191 s |
+| CPU time, warm, original queries | 99 s | 209 s |
+| Queries slower than Postgres when warm (best version) | Q17, Q19 | Q17, Q19, Q22 |
+| Failures | Q3, Q5, Q8, Q9, Q21 orig. (per-query memory limit) | the same five |
+
+Per query, ClickHouse times in seconds: median (p95) for warm. Slowdown = ReplacingMergeTree ÷
+MergeTree, warm (cold). Memory is the container's peak anonymous memory on the warm runs, MB.
+
+| Query | Version | MergeTree cold | MergeTree warm | Replacing cold | Replacing warm | Slowdown | Memory, MT → RMT |
+|---|---|--:|--:|--:|--:|--:|--:|
+| Q1 | original | 2.99 | 2.58 (2.86) | 6.49 | 5.78 (5.99) | **2.25x** (2.17x) | 490 → 1,016 |
+| Q2 | original | 1.27 | 0.94 (1.07) | 1.65 | 1.33 (1.72) | **1.42x** (1.29x) | 1,403 → 1,428 |
+| Q2 | rewritten | 2.17 | 2.00 (2.20) | 2.52 | 2.19 (2.62) | **1.10x** (1.17x) | 1,334 → 1,439 |
+| Q3 | original | memory limit | | memory limit | | — | — |
+| Q3 | tuned | 9.40 | 9.43 (9.81) | 8.94 | 9.36 (12.05) | **0.99x** (0.95x) | 1,719 → 1,927 |
+| Q4 | original | 2.84 | 1.60 (1.75) | 4.32 | 3.39 (3.88) | **2.12x** (1.52x) | 748 → 1,065 |
+| Q4 | rewritten | 4.00 | 2.75 (2.88) | 6.17 | 4.79 (4.88) | **1.74x** (1.54x) | 1,478 → 1,848 |
+| Q5 | original | memory limit | | memory limit | | — | — |
+| Q5 | tuned | 22.48 | 25.03 (29.89) | 19.37 | 24.51 (33.62) | **0.98x** (0.86x) | 2,408 → 2,312 |
+| Q6 | original | 0.37 | 0.18 (0.18) | 0.73 | 0.67 (0.94) | **3.68x** (2.00x) | 483 → 626 |
+| Q7 | original | 6.74 | 7.33 (8.82) | 11.10 | 11.93 (12.35) | **1.63x** (1.65x) | 2,205 → 2,290 |
+| Q8 | original | memory limit | | memory limit | | — | — |
+| Q8 | tuned | 35.04 | 28.14 (28.92) | 40.52 | 25.55 (38.42) | **0.91x** (1.16x) | 2,525 → 2,556 |
+| Q9 | original | memory limit | | memory limit | | — | — |
+| Q9 | tuned | 32.02 | 38.12 (40.82) | 54.51 | 38.28 (47.90) | **1.00x** (1.70x) | 2,602 → 2,969 |
+| Q10 | original | 6.49 | 5.54 (5.87) | 9.20 | 8.67 (8.74) | **1.56x** (1.42x) | 2,662 → 2,648 |
+| Q11 | original | 0.97 | 0.77 (0.81) | 1.57 | 1.13 (1.14) | **1.47x** (1.62x) | 657 → 661 |
+| Q12 | original | 1.98 | 0.60 (0.78) | 3.19 | 2.59 (2.78) | **4.31x** (1.62x) | 668 → 2,224 |
+| Q13 | original | 12.35 | 2.62 (2.76) | 13.73 | 4.93 (5.21) | **1.88x** (1.11x) | 1,142 → 2,179 |
+| Q14 | original | 0.26 | 0.19 (0.21) | 0.35 | 0.20 (0.21) | **1.06x** (1.32x) | 738 → 718 |
+| Q15 | original | 0.25 | 0.24 (0.34) | 0.45 | 0.36 (0.36) | **1.50x** (1.82x) | 659 → 618 |
+| Q16 | original | 0.64 | 0.41 (0.42) | 1.05 | 0.63 (0.68) | **1.54x** (1.63x) | 690 → 688 |
+| Q17 | original | 4.02 | 3.58 (3.88) | 12.98 | 13.56 (14.78) | **3.78x** (3.23x) | 1,023 → 1,870 |
+| Q17 | rewritten | 2.51 | 1.54 (1.82) | 6.67 | 6.50 (7.01) | **4.21x** (2.66x) | 566 → 935 |
+| Q18 | original | 4.90 | 4.69 (6.45) | 12.27 | 11.52 (12.71) | **2.46x** (2.51x) | 1,635 → 2,064 |
+| Q19 | original | 3.41 | 1.41 (1.43) | 5.65 | 4.30 (5.10) | **3.05x** (1.66x) | 774 → 1,091 |
+| Q20 | original | 0.82 | 0.28 (0.29) | 1.23 | 0.86 (0.87) | **3.11x** (1.50x) | 520 → 567 |
+| Q20 | rewritten | 0.87 | 0.43 (0.43) | 1.36 | 0.98 (1.02) | **2.27x** (1.56x) | 570 → 572 |
+| Q21 | original | memory limit | | memory limit | | — | — |
+| Q21 | rewritten | 19.49 | 19.89 (20.05) | 43.35 | 27.41 (39.76) | **1.38x** (2.22x) | 1,905 → 1,967 |
+| Q22 | original | 0.80 | 0.54 (0.55) | 1.22 | 0.92 (0.98) | **1.70x** (1.53x) | 624 → 775 |
+| Q22 | rewritten | 0.66 | 0.49 (0.51) | 1.43 | 1.01 (1.20) | **2.06x** (2.16x) | 726 → 937 |
+
+### Key findings (ReplacingMergeTree reads)
+
+1. **`FINAL` makes reads about 1.8x slower on average (geometric mean, warm; 1.6x cold).** That
+   halves the speedup over Postgres: 22.8x → 10.9x warm as written, and 15.6x → **8.6x** with
+   the tuned joins, **below the 10x claim**. Cold, it stays above: 17.1x and 12.5x.
+2. **The cost is largest where the scan is the whole query.** `FINAL` merges the rows of
+   overlapping parts by the sort key before the query sees them. Q6, Q12, Q17, Q19 and Q20, which
+   are mostly a filtered scan of `lineitem`, are 3–4.3x slower. The heavy joins (tuned Q3, Q5,
+   Q8, Q9) are unchanged (0.91–1.00x warm), because the join, not the scan, dominates.
+3. **The penalty is a constant factor, not one that grows with scale.** In the writes benchmark
+   (section 7), Q1 was 2.4x, 2.0x and 2.0x slower than MergeTree at SF 1, 3 and 10. So the 200
+   GB system should expect the same roughly 2x on reads, not worse.
+4. **Memory rises, but no new failures at SF 10.** The same five queries fail, all on the
+   per-query limit. Some queries need much more memory: Q12 668 → 2,224 MB, Q13 1,142 → 2,179 MB,
+   Q1 490 → 1,016 MB. On a server sized as tightly as this one, that is less headroom for
+   concurrency.
+5. **Merging doesn't remove the cost.** After the build, `lineitem` settled at 42 parts against
+   12 for MergeTree. But section 7's Q1 was no faster after `OPTIMIZE FINAL` (6.53 s against
+   5.56 s before). A production table that receives corrections all day will have more
+   overlapping parts, not fewer, so these figures are closer to a best case.
+
+**For the risk assessment and TCO:**
+- **The 10x claim holds on warm reads only for plain MergeTree.** With the correction design that
+  section 7 requires, the warm speedup at SF 10 is 8.6–10.9x, and cold 12.5–17.1x. The claim
+  should be restated as "about 10x", conditional on the correction design.
+- **CPU per warm query doubled (99 → 209 s for the 17 originals).** The TCO should size
+  ClickHouse compute for ReplacingMergeTree, not for the MergeTree benchmark.
+- **Lightweight-UPDATE tables hold about 1 GB of server memory while idle.** If lightweight
+  UPDATE is used at all, for example for rare fixes, this has to be in the memory sizing.
