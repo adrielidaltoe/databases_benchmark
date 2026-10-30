@@ -57,7 +57,7 @@ from check_rewrites import CH_CONN, PG_DSN, TIMEOUT_S, normalize
 from common import RESULTS_DIR, ROOT, SCALE_FACTORS, read_sql, require_only
 from gen_workload import WORKLOAD_DIR
 from run_queries import (QUERIES_DIR, RESOURCE_KEYS, ResourceMonitor, cgroup_dir, classify, p95,
-                         settings_snapshot)
+                         replacing_ddl, settings_snapshot)
 
 METHODS = {"postgres": ["postgres"], "clickhouse": ["lightweight", "replacing"]}
 READ_QUERIES = ["q01", "q06"]
@@ -269,10 +269,7 @@ class ClickHouse:
                if s.split()[2] in ("orders", "lineitem")}
         for t, stmt in ddl.items():
             if self.replacing:
-                stmt = stmt.replace(
-                    ") ENGINE = MergeTree",
-                    ",\n    _version UInt64 DEFAULT 0,\n    _is_deleted UInt8 DEFAULT 0\n"
-                    ") ENGINE = ReplacingMergeTree(_version, _is_deleted)")
+                stmt = replacing_ddl(stmt)
                 extra = ", 0, 0"
             else:
                 # lightweight UPDATE needs the row's block number and offset stored

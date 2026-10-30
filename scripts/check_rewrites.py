@@ -57,9 +57,10 @@ def same_rows(a: list[list], b: list[list]) -> str | None:
     return None
 
 
-def make_runner(engine: str, sf: int):
+def make_runner(engine: str, sf: int, database: str | None = None, ch_settings: dict | None = None):
     """Return run(sql, settings=None) -> rows for the engine, connected to the sf<N>
-    schema/database. settings are per-query ClickHouse settings (ignored by Postgres);
+    schema/database (ClickHouse: or `database`, with `ch_settings` on every query).
+    settings are per-query ClickHouse settings (ignored by Postgres);
     run.handle is the underlying psycopg connection / clickhouse-connect client."""
     if engine == "postgres":
         import psycopg
@@ -75,8 +76,8 @@ def make_runner(engine: str, sf: int):
         import clickhouse_connect
 
         client = clickhouse_connect.get_client(
-            **CH_CONN, database=f"sf{sf}", send_receive_timeout=TIMEOUT_S + 60,
-            settings={"max_execution_time": TIMEOUT_S, "use_query_cache": 0},
+            **CH_CONN, database=database or f"sf{sf}", send_receive_timeout=TIMEOUT_S + 60,
+            settings={"max_execution_time": TIMEOUT_S, "use_query_cache": 0, **(ch_settings or {})},
         )
 
         def run(sql, settings=None):

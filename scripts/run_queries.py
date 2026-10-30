@@ -25,6 +25,11 @@ Resource use per run comes from the container's cgroup v2 files on the host
   read_mb / write_mb  bytes read from / written to the block device (io.stat);
                near 0 on warm runs, the real disk I/O on cold runs
 
+--table-engine replacing (ClickHouse only) reads ReplacingMergeTree copies of all
+8 tables instead (database sf<N>_rmt, rebuilt from sf<N> at the start of the run,
+with the _version / _is_deleted columns of the write benchmark) with final = 1 on
+every query: the read cost of the correction design. Saved as engine clickhouse_rmt.
+
 Times are client-side wall clock including fetching the result (small for all
 TPC-H queries), measured the same way on both engines. ClickHouse query cache
 is off; Postgres has no result cache.
@@ -50,7 +55,9 @@ query (pg_stat_force_next_flush() makes the backend publish them right away).
 
     python scripts/run_queries.py --engine postgres --sf 1
     python scripts/run_queries.py --engine clickhouse --sf 1 --runs 5 --queries q01,q17
+    python scripts/run_queries.py --engine clickhouse --sf 10 --table-engine replacing
     python scripts/run_queries.py --compare --sf 1     # cross-engine result check
+    python scripts/run_queries.py --compare --sf 10 --table-engine replacing
 """
 import argparse
 import csv
@@ -64,7 +71,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from check_rewrites import CH_CONN, PG_DSN, REWRITTEN, TIMEOUT_S, make_runner, normalize, same_rows
-from common import CONTAINERS, RESULTS_DIR, ROOT, SCALE_FACTORS, require_only
+from common import CONTAINERS, RESULTS_DIR, ROOT, SCALE_FACTORS, read_sql, require_only
+from load_clickhouse import wait_for_merges
 
 # clickhouse-connect logs every refused connection while the server restarts;
 # the exceptions still reach wait_ready / timed, so the log lines are just noise
@@ -72,6 +80,39 @@ logging.getLogger("clickhouse_connect").setLevel(logging.CRITICAL)
 
 QUERIES_DIR = ROOT / "queries"
 ALL_QUERIES = [f"q{i:02d}" for i in range(1, 23)]
+
+# --table-engine: label in the results, ClickHouse database and settings for each
+TABLE_ENGINES = {
+    "mergetree": {"label": "clickhouse", "db": lambda sf: f"sf{sf}", "settings": None},
+    "replacing": {"label": "clickhouse_rmt", "db": lambda sf: f"sf{sf}_rmt",
+                  "settings": {"final": 1}},
+}
+
+
+def replacing_ddl(stmt: str) -> str:
+    """MergeTree CREATE TABLE -> ReplacingMergeTree with row version and delete flag."""
+    return stmt.replace(") ENGINE = MergeTree",
+                        ",\n    _version UInt64 DEFAULT 0,\n    _is_deleted UInt8 DEFAULT 0\n"
+                        ") ENGINE = ReplacingMergeTree(_version, _is_deleted)")
+
+
+def build_replacing(sf: int) -> float:
+    """Rebuild sf<N>_rmt: every sf<N> table as ReplacingMergeTree (version 0, not
+    deleted), then wait for merges as the loader does. Returns seconds taken."""
+    import clickhouse_connect
+
+    db = TABLE_ENGINES["replacing"]["db"](sf)
+    t0 = time.perf_counter()
+    client = clickhouse_connect.get_client(**CH_CONN, send_receive_timeout=TIMEOUT_S + 60,
+                                           settings={"max_execution_time": TIMEOUT_S})
+    client.command(f"DROP DATABASE IF EXISTS {db} SYNC")
+    client.command(f"CREATE DATABASE {db}")
+    for stmt in read_sql("clickhouse_tables.sql"):
+        t = stmt.split()[2]
+        client.command(replacing_ddl(stmt), settings={"database": db})
+        client.command(f"INSERT INTO {db}.{t} SELECT *, 0, 0 FROM sf{sf}.{t}")
+    wait_for_merges(client, db)
+    return round(time.perf_counter() - t0, 1)
 
 
 def query_list(engine: str, only: set[str] | None) -> list[tuple[str, str, str]]:
@@ -106,12 +147,13 @@ def evict_data_files(engine: str) -> float:
     return time.perf_counter() - t0
 
 
-def wait_ready(engine: str, sf: int, timeout: float = 120):
-    """Return a fresh run(sql) once the engine answers queries."""
+def wait_ready(engine: str, sf: int, timeout: float = 120, **conn):
+    """Return a fresh run(sql) once the engine answers queries (conn: make_runner's
+    ClickHouse database / settings)."""
     t0 = time.perf_counter()
     while True:
         try:
-            run = make_runner(engine, sf)
+            run = make_runner(engine, sf, **conn)
             run("SELECT 1")
             return run
         except Exception:
@@ -120,13 +162,13 @@ def wait_ready(engine: str, sf: int, timeout: float = 120):
             time.sleep(1)
 
 
-def cold_restart(engine: str, sf: int):
+def cold_restart(engine: str, sf: int, **conn):
     """Stop the container, evict its data files from the OS page cache, start it again."""
     container = CONTAINERS[engine]
     subprocess.run(["docker", "stop", container], check=True, capture_output=True)
     evict_data_files(engine)
     subprocess.run(["docker", "start", container], check=True, capture_output=True)
-    return wait_ready(engine, sf)
+    return wait_ready(engine, sf, **conn)
 
 
 def container_running(engine: str) -> bool:
@@ -294,11 +336,23 @@ def settings_snapshot(engine: str, sf: int) -> dict:
     }
 
 
-def run_engine(engine: str, sf: int, runs: int, cold: bool, only: set[str] | None) -> None:
+def run_engine(engine: str, sf: int, runs: int, cold: bool, only: set[str] | None,
+               table_engine: str = "mergetree") -> None:
     require_only(engine)
     started = datetime.now(timezone.utc)
     ts = started.strftime("%Y%m%dT%H%M%SZ")
-    run = wait_ready(engine, sf)
+    label, conn, extra = engine, {}, {}
+    if engine == "clickhouse":
+        te = TABLE_ENGINES[table_engine]
+        label = te["label"]
+        conn = {"database": te["db"](sf), "ch_settings": te["settings"]}
+        extra = {"table_engine": table_engine, "database": conn["database"],
+                 "query_settings": te["settings"]}
+        if table_engine == "replacing":
+            wait_ready(engine, sf)  # the server may still be starting
+            print(f"building {conn['database']}", flush=True)
+            extra["build_s"] = build_replacing(sf)
+    run = wait_ready(engine, sf, **conn)
     settings = settings_snapshot(engine, sf)
     cgroup = cgroup_dir(engine)  # docker stop/start keeps the container id
     results = []
@@ -306,7 +360,7 @@ def run_engine(engine: str, sf: int, runs: int, cold: bool, only: set[str] | Non
     for q, variant, sql in query_list(engine, only):
         entry = {"query": q, "variant": variant, "status": "ok"}
         if cold:
-            run = cold_restart(engine, sf)
+            run = cold_restart(engine, sf, **conn)
             secs, rows, err, res, scan = timed_with_scan(engine, sf, run, sql, cgroup)
             entry["cold_s"] = round(secs, 3)
             entry["cold_resources"] = res
@@ -332,7 +386,7 @@ def run_engine(engine: str, sf: int, runs: int, cold: bool, only: set[str] | Non
             if not container_running(engine):  # e.g. OOM-killed: bring it back for the next query
                 entry["status"] = "container_died"
                 subprocess.run(["docker", "start", CONTAINERS[engine]], check=True, capture_output=True)
-            run = wait_ready(engine, sf)
+            run = wait_ready(engine, sf, **conn)
         if warm:
             entry["warm_s"] = [round(x, 3) for x in warm]
             entry["warm_median_s"] = round(statistics.median(warm), 3)
@@ -352,9 +406,9 @@ def run_engine(engine: str, sf: int, runs: int, cold: bool, only: set[str] | Non
 
     cold_method = ("engine stopped; its data volume evicted from the OS page cache with "
                    "posix_fadvise(DONTNEED) per file; engine restarted") if cold else None
-    save(engine, sf, ts, {"engine": engine, "sf": sf, "timestamp": ts, "runs": runs, "cold": cold,
-                          "cold_method": cold_method,
-                          "timeout_s": TIMEOUT_S, **settings, "queries": results})
+    save(label, sf, ts, {"engine": label, "sf": sf, "timestamp": ts, "runs": runs, "cold": cold,
+                         "cold_method": cold_method, **extra,
+                         "timeout_s": TIMEOUT_S, **settings, "queries": results})
 
 
 def save(engine: str, sf: int, ts: str, data: dict) -> None:
@@ -386,11 +440,11 @@ def latest(engine: str, sf: int) -> dict:
     return json.loads(paths[-1].read_text())
 
 
-def compare_engines(sf: int) -> None:
+def compare_engines(sf: int, table_engine: str = "mergetree") -> None:
     """Check the latest Postgres and ClickHouse runs returned the same results.
     ClickHouse tuned versions are checked against the Postgres original."""
     pg, ch = ({(e["query"], e["variant"]): e for e in latest(eng, sf)["queries"]}
-              for eng in ("postgres", "clickhouse"))
+              for eng in ("postgres", TABLE_ENGINES[table_engine]["label"]))
     for (q, v) in [k for k in ch if k[1] == "tuned" and (k[0], "original") in pg]:
         pg[(q, v)] = pg[(q, "original")]
     for key in sorted(pg.keys() & ch.keys()):
@@ -416,13 +470,17 @@ def main():
     ap.add_argument("--runs", type=int, default=5, help="warm runs per query (default 5)")
     ap.add_argument("--no-cold", action="store_true", help="skip cold runs and restarts")
     ap.add_argument("--queries", help="comma-separated subset, e.g. q01,q17")
+    ap.add_argument("--table-engine", choices=list(TABLE_ENGINES), default="mergetree",
+                    help="ClickHouse only: replacing = ReplacingMergeTree copies read with final=1")
     ap.add_argument("--compare", action="store_true", help="compare latest Postgres vs ClickHouse results")
     args = ap.parse_args()
+    if args.engine == "postgres" and args.table_engine != "mergetree":
+        ap.error("--table-engine is for ClickHouse only")
     if args.compare:
-        compare_engines(args.sf)
+        compare_engines(args.sf, args.table_engine)
     elif args.engine:
         only = set(args.queries.split(",")) if args.queries else None
-        run_engine(args.engine, args.sf, args.runs, not args.no_cold, only)
+        run_engine(args.engine, args.sf, args.runs, not args.no_cold, only, args.table_engine)
     else:
         ap.error("give --engine or --compare")
 
