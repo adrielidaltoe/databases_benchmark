@@ -25,7 +25,8 @@ accept it. The planned deliverables are:
 4. **A migration plan** with rollback procedures.
 
 This README covers the parts done so far: the setup, data loading, query benchmarks at
-three scale factors, and the ClickHouse join tuning needed to complete them at SF 10. Concurrency, UPDATE/DELETE, TCO, risk and the migration plan come next.
+three scale factors, the ClickHouse join tuning needed to complete them at SF 10, the write
+workload (sections 6–8) and concurrency (section 9). TCO, risk and the migration plan come next.
 
 ### Synthetic data: TPC-H
 
@@ -1089,3 +1090,221 @@ MergeTree, warm (cold). Memory is the container's peak anonymous memory on the w
   ClickHouse compute for ReplacingMergeTree, not for the MergeTree benchmark.
 - **Lightweight-UPDATE tables hold about 1 GB of server memory while idle.** If lightweight
   UPDATE is used at all, for example for rare fixes, this has to be in the memory sizing.
+
+## 9. Concurrency
+
+Sections 4–8 run one query at a time on an idle server. A reporting warehouse doesn't work
+that way: several reports run at once while corrections keep arriving. This section runs the
+TPC-H throughput test at SF 10 on both engines, with corrections applied during the reads.
+
+```bash
+python scripts/run_concurrency.py --engine postgres --sf 10 --stop-if-flat
+python scripts/run_concurrency.py --engine clickhouse --sf 10
+python scripts/run_concurrency.py --engine clickhouse --sf 1 --levels 1,2 --queries q01,q06  # smoke test
+```
+
+### Setup
+
+A **stream** is one analyst running the full set of 22 reports, one after another. The number
+of streams S is the number of analysts working at the same time.
+[scripts/run_concurrency.py](scripts/run_concurrency.py) runs one level per value of S
+(1, 2, 4, 8). The levels run one after another, never at the same time, and each one runs as
+follows:
+
+1. **Prepare:** rebuild fresh copies of `orders` and `lineitem`, so every level starts from
+   the same data, then restart the container with an empty cache (cold start).
+2. **Start all streams at once and start the clock:**
+   - **S query streams**, each running all 22 TPC-H queries in sequence. Every stream runs the
+     same 22 queries, but in a different order, so the streams don't all hit the same heavy
+     query at the same moment.
+   - **1 corrections stream**, applying S correction sets in sequence (inserts, updates,
+     deletes, upserts): late-arriving corrections while the reports run.
+3. **Stop the clock** when every stream has finished. The elapsed time is the level's
+   **wall time**.
+
+| Level (S) | Query streams in parallel | Queries in total | Correction sets |
+|--:|--:|--:|--:|
+| 1 | 1 | 22 | 1 |
+| 2 | 2 | 44 | 2 |
+| 4 | 4 | 88 | 4 |
+| 8 | 8 | 176 | 8 |
+
+For example, Postgres with 2 streams took 4,766 s: two analysts each ran all 22 reports side
+by side, corrections ran alongside them, and the last report finished 4,766 s after the start.
+
+The details of each step:
+
+- **Data:** each level starts from fresh copies of `orders` and `lineitem`, built as in the
+  write benchmark (section 7), so every level sees the same data.
+  - Postgres: schema `c_sf10`, with `VACUUM ANALYZE` after the build and autovacuum on, as in
+    production. The other 6 tables are read from `sf10` through `search_path`.
+  - ClickHouse: database `c_sf10_rmt`, with all 8 tables as ReplacingMergeTree (section 8).
+- **Cold start:** the container is stopped, its data is evicted from the page cache, and it is
+  restarted, as for the cold runs in section 4.
+- **Query streams:** S streams start together. Stream *i* runs the 22 queries once, in the
+  order of TPC-H stream *i* (spec Appendix A). Each query uses its best version for that engine:
+  the fastest one that completed in the single-user SF 10 run. On ClickHouse that is the
+  ReplacingMergeTree run with `final = 1` (section 8), including the tuned Q3, Q5, Q8 and Q9.
+- **Corrections stream:** one more stream applies S correction sets back to back, as TPC-H
+  applies S refresh pairs.
+  - **Which corrections:** the write scenarios from section 7, with the same pre-generated rows
+    and the same code: `insert_batch`, `insert_small`, `update_point`, `update_100`,
+    `update_1k`, `update_10k`, `delete_point`, `delete_100`, `delete_1k`, `upsert_1k`. The
+    restatement is left out: it is a scheduled bulk job, not a late correction, and a Postgres
+    timeout at SF 10.
+  - **How many times:** a set is one run of each of the 10 scenarios, so each scenario runs
+    once at level 1, twice at level 2, 4 times at level 4 and 8 times at level 8 (10, 20, 40
+    and 80 write operations).
+  - **Each repeat uses different rows:** set *k* uses run *k* of each scenario from section 7.
+    For example, at level 4 `update_1k` runs 4 times, on 4 different batches of 1,000 line
+    items. No row is corrected twice.
+  - **Set by set, one at a time:** the stream applies the 10 scenarios in the order above, then
+    starts the next set. Only one correction runs at a time, alongside the query streams.
+  - **Method:** each engine uses its production method: Postgres transactions, ClickHouse
+    ReplacingMergeTree inserts (the lightweight `UPDATE`/`DELETE` method from section 7 is not
+    used here).
+- **Limits:** the same as every other section: 3 CPUs and 4 GB per container, a 30-minute
+  timeout, and on ClickHouse `max_memory_usage` = 3 GB per query and
+  `max_server_memory_usage` = 3.5 GB for the server (section 2). Timeouts and memory-limit
+  errors are recorded as results. A failed query is not retried, and its stream moves on.
+- **Metrics:**
+  - each query's time and status;
+  - its **slowdown**: time ÷ the single-user warm median;
+  - **queries per hour**: the level's throughput, i.e. the rate of successful work. It is the
+    number of completed queries ÷ the level's wall time × 3600.
+    - *Completed queries* are those from the query streams only. Failed and timed-out queries
+      are left out, and so are corrections, which are reported separately.
+    - *Wall time* (step 3 above) ends when the last query finishes. At every level the
+      corrections finished earlier, within the first 3–62 s on ClickHouse and 94–409 s on
+      Postgres.
+    - Example: Postgres with 2 streams completed 44 queries in 4,766 s, so
+      44 ÷ 4,766 × 3600 = 33.2 queries per hour;
+  - the corrections' times and failures;
+  - the container's CPU, peak memory and disk reads over the level (cgroup, as in section 4).
+- **Postgres with 8 streams was not run.** The run was interrupted after about 2.5 hours, when
+  the runner process died, and was not repeated. At 4 streams Postgres was still far below
+  ClickHouse's throughput and already timing out, so 8 streams would not change the
+  conclusions.
+- **Raw data:** `results/concurrency_postgres_sf10_20261031T135127Z.json`,
+  `results/concurrency_clickhouse_sf10_20261031T222440Z.json`, and one line per level in
+  `results/concurrency.csv`.
+
+### Results (SF 10)
+
+**How to read this table.** Each row is one level: S streams running at the same time, plus
+the corrections stream.
+- **Queries/h** is the throughput: completed queries per hour. Read it down each engine: if it
+  rises, adding analysts gets more reports done; if it stays flat, the server is at its limit.
+  Every query counts as 1, whether it is a light or a heavy one.
+- **Work completed** weighs each completed query by its single-user warm time. It is the share
+  of the reporting workload that actually produced a result. Read it together with queries/h:
+  queries/h alone flatters ClickHouse at high concurrency, because the queries that still
+  complete there are mostly the light ones.
+- **Slowdown** is a query's time here ÷ its single-user warm time: 1x is as fast as alone, 3x is
+  3 times slower. The **geomean** is the typical slowdown across the completed queries (a
+  geometric mean, so a few extreme ratios don't dominate). The **p95** is the bad end: 95% of
+  the completed queries slowed down by at most this much. Failed queries are not included, so
+  on ClickHouse from 2 streams on they describe the queries that survived.
+
+| Streams | Engine | Wall time | Completed | Failed | Queries/h | Work completed | Slowdown, geomean | Slowdown, p95 | Avg cores | Disk read |
+|--:|---|--:|--:|---|--:|--:|--:|--:|--:|--:|
+| 1 | Postgres | 4,133 s | 21 / 22 | 1 timeout | 18.3 | 98% | 2.29x | 21.1x | 0.48 | 254 GB |
+| 1 | ClickHouse | 223 s | 21 / 22 | 1 memory | 338.9 | 80% | 1.45x | 2.8x | 2.53 | 9.8 GB |
+| 2 | Postgres | 4,766 s | 44 / 44 | — | 33.2 | 100% | 3.51x | 79.0x | 0.67 | 553 GB |
+| 2 | ClickHouse | 505 s | 36 / 44 | 8 memory | 256.7 | 62% | 3.32x | 6.5x | 2.41 | 22.6 GB |
+| 4 | Postgres | 6,796 s | 82 / 88 | 6 timeouts | 43.4 | 86% | 4.02x | 82.5x | 1.10 | 929 GB |
+| 4 | ClickHouse | 816 s | 61 / 88 | 26 memory, 1 timeout | 269.0 | 34% | 7.74x | 20.6x | 2.56 | 39.4 GB |
+| 8 | Postgres | not run | | | | | | | | |
+| 8 | ClickHouse | 894 s | 68 / 176 | 108 memory | 273.7 | **9%** | 16.61x | 36.2x | 2.78 | 37.9 GB |
+
+ClickHouse's container peaked at its 4,096 MB limit at every level, and Postgres's at 4 streams.
+Postgres's peak working memory stayed under 1 GB. The rest was page cache.
+
+Corrections applied during the reads (S sets per level, 10 runs per set):
+
+| Streams | Postgres: time per set | Postgres: failed | ClickHouse: time per set | ClickHouse: failed |
+|--:|--:|--:|--:|--:|
+| 1 | 94 s | 0 / 10 | 3.1 s | 0 / 10 |
+| 2 | 112 s | 0 / 20 | 5.4 s | 0 / 20 |
+| 4 | 102 s | 0 / 40 | 5.5 s | **4 / 40** |
+| 8 | not run | | 7.8 s | **28 / 80** |
+
+The ClickHouse corrections that failed are of every kind: small inserts, point and batch
+updates, deletes, upserts and the daily batch insert. All of them ran out of memory (code 241,
+or code 33 with an Arrow allocation error while reading the inserted batch).
+
+ClickHouse queries that failed, out of S runs per level (blank: none failed):
+
+| Query | 1 stream | 2 streams | 4 streams | 8 streams |
+|---|--:|--:|--:|--:|
+| Q9 (tuned) | 1 / 1 | 2 / 2 | 4 / 4 | 8 / 8 |
+| Q7 | | 2 / 2 | 4 / 4 | 8 / 8 |
+| Q8 (tuned) | | | 4 / 4 | 8 / 8 |
+| Q10 | | 1 / 2 | 4 / 4 | 8 / 8 |
+| Q21 (rewritten) | | | 3 / 4 | 8 / 8 |
+| Q5 (tuned) | | 1 / 2 | 2 / 4 | 8 / 8 |
+| Q13 | | 2 / 2 | 1 / 4 | 7 / 8 |
+| Q1, Q4, Q12, Q18 | | | Q4 1, Q12 2, Q18 1 | 7 / 8 each |
+| Q2, Q3 (tuned), Q17 (rewritten) | | | Q3 1 | 6, 6, 5 / 8 |
+| Q11, Q22, Q6, Q15, Q20 | | | | 3, 2, 1, 1, 1 / 8 |
+| Q14, Q16, Q19 | | | | |
+
+Postgres timeouts: Q13 in 5 of 7 runs (including the 1-stream run), Q9 and Q21 once each at
+4 streams.
+
+### Key findings (concurrency)
+
+1. **With one report at a time, ClickHouse's lead holds: 18.5x more completed queries per
+   hour.** The whole stream takes 223 s against 4,133 s, and the corrections stream barely
+   slows it down (1.45x geomean). But even here Q9 runs out of memory, which it didn't do alone
+   in section 8. The corrections stream's memory is enough to push it over.
+2. **From 2 streams on, ClickHouse's throughput stops growing and its useful work collapses.**
+   Queries per hour stay at 257–274. The share of the workload that completes falls from 80%
+   to 62%, 34% and 9% at 8 streams.
+   - The failures are memory, not time. Each query fits the 3 GB per-query limit on its own, but
+     together they exceed the 3.5 GB server limit, and whichever query asks for the next block
+     fails. Failures are quick: 15–40 s on average.
+   - The heavy joins fail first: Q7 and Q9 never complete with 2 or more streams; Q5, Q8, Q10
+     and Q21 also fail every time at 8 streams. These multi-table joins are the closest match to
+     the regulatory reports in section 1.
+   - CPU is close to saturated at every level (2.4–2.8 of 3 cores). So even with more memory,
+     the completed queries would slow down roughly in proportion to the number of streams.
+3. **Postgres degrades slowly, but from a much slower start.** Its completed queries per hour
+   rise from 18.3 to 33.2 and 43.4. It completes 86–100% of the workload, and it never uses more
+   than 1.1 of its 3 cores.
+   - It is I/O-bound. One stream reads 254 GB from disk for a 16.7 GB database, and 4 streams
+     929 GB. The 4 GB container's page cache can't hold the working set of several concurrent
+     scans.
+   - The queries that suffer most are the fast index lookups: Q2, Q11, Q17 and Q19 run 15–100x
+     slower than alone, because the scans of the other streams evict their index pages. The
+     large scans mostly slow 1–3x.
+   - Q13 times out in 5 of 7 runs, even with a single stream, but it took 42 s alone (warm) and
+     115 s cold. It may be choosing a different plan on the `c_sf10` copies, but the plan wasn't
+     checked here. **This is an open item.**
+4. **Under load, ClickHouse loses corrections; Postgres doesn't.** With 4 and 8 streams, 32 of
+   120 ClickHouse correction runs failed on memory. Postgres applied all 70 of its runs, at a
+   steady 94–112 s per set (most of it the daily batch insert and the 10,000-line update, as in
+   section 7). When they succeed, ClickHouse's
+   corrections are still 19–30x faster per set.
+5. **The comparison at equal hardware ends in different failure modes.** With 4 streams,
+   Postgres finishes the batch in 1.9 hours, with 6 reports timed out. ClickHouse finishes in
+   14 minutes, with 27 reports and 4 correction runs failed. Neither result is fit for a
+   regulatory window as sized here. The difference is that Postgres needs more I/O and memory
+   to get faster, while ClickHouse needs more memory to give complete answers at all.
+
+**For the risk assessment and TCO:**
+- **The 10x claim is a single-user figure.** At 2–4 concurrent reports on this hardware,
+  ClickHouse completes 7.7x and 6.2x more queries per hour than Postgres. Weighted by work
+  done, it completes less of the workload than Postgres from 2 streams on.
+- **Memory, not CPU, sizes a ClickHouse server for concurrent reports.** The TCO should size
+  memory as (concurrent heavy reports × per-query peak, about 2–3 GB each at SF 10, section 8)
+  plus headroom for inserts. Per-query memory grows with the data, so at 200 GB that figure will
+  be far larger than at SF 10. The alternative is a hard limit on concurrent reports, which
+  stretches the window.
+- **Admission control is required before go-live:** `max_concurrent_queries` or workload
+  scheduling for reports, and a separate memory budget for the correction writes, so that a
+  read peak can't reject a correction.
+- **Every correction writer needs retry logic on ClickHouse.** A rejected write is silently
+  missing from the next report unless the loader retries it. Postgres never rejected one.
+- **Postgres sizing is I/O and page cache.** More RAM for cache and faster storage would help
+  it more than more cores, since it used at most 1.1 of its 3.

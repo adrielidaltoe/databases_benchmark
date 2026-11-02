@@ -121,12 +121,17 @@ class Postgres:
 
     name = "postgres"
 
-    def __init__(self, sf: int):
+    def __init__(self, sf: int, prefix: str = "w"):
+        self.sf, self.schema = sf, f"{prefix}_sf{sf}"
+        self.reconnect()
+
+    def reconnect(self) -> None:
+        """(Re)open the connection, e.g. after a container restart."""
         import psycopg
 
-        self.sf, self.schema = sf, f"w_sf{sf}"
         self.conn = psycopg.connect(PG_DSN, autocommit=True)
         self.conn.execute(f"SET statement_timeout = '{TIMEOUT_S}s'")
+        self.conn.execute(f"SET search_path TO {self.schema}")
 
     def setup(self) -> None:
         c, src = self.conn, f"sf{self.sf}"
@@ -237,23 +242,29 @@ class Postgres:
 class ClickHouse:
     """Columnar: lightweight UPDATE/DELETE on MergeTree, or ReplacingMergeTree."""
 
-    def __init__(self, sf: int, method: str):
+    def __init__(self, sf: int, method: str, prefix: str = "w"):
         import clickhouse_connect
 
         self.sf, self.name = sf, method
         self.replacing = method == "replacing"
-        self.db = f"w_sf{sf}_{'rmt' if self.replacing else 'lw'}"
+        self.db = f"{prefix}_sf{sf}_{'rmt' if self.replacing else 'lw'}"
         self.version = 0  # ReplacingMergeTree row version; the loaded data is version 0
-        base = {"max_execution_time": TIMEOUT_S, "use_query_cache": 0,
-                # the update and delete statements carry their keys as literals
-                "max_query_size": 100_000_000, "max_ast_elements": 10_000_000,
-                "max_expanded_ast_elements": 10_000_000}
-        admin = clickhouse_connect.get_client(**CH_CONN, settings=base)
+        self.base = {"max_execution_time": TIMEOUT_S, "use_query_cache": 0,
+                     # the update and delete statements carry their keys as literals
+                     "max_query_size": 100_000_000, "max_ast_elements": 10_000_000,
+                     "max_expanded_ast_elements": 10_000_000}
+        admin = clickhouse_connect.get_client(**CH_CONN, settings=self.base)
         admin.command(f"DROP DATABASE IF EXISTS {self.db} SYNC")
         admin.command(f"CREATE DATABASE {self.db}")
-        self.client = clickhouse_connect.get_client(
-            **CH_CONN, database=self.db, send_receive_timeout=TIMEOUT_S + 60, settings=base)
+        self.reconnect()
         self.tag = None
+
+    def reconnect(self) -> None:
+        """(Re)open the client, e.g. after a container restart."""
+        import clickhouse_connect
+
+        self.client = clickhouse_connect.get_client(
+            **CH_CONN, database=self.db, send_receive_timeout=TIMEOUT_S + 60, settings=self.base)
 
     def _settings(self, extra: dict | None = None) -> dict:
         return {"log_comment": self.tag, **(extra or {})} if self.tag else (extra or {})

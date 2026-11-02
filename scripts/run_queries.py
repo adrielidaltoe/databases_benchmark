@@ -96,6 +96,15 @@ def replacing_ddl(stmt: str) -> str:
                         ") ENGINE = ReplacingMergeTree(_version, _is_deleted)")
 
 
+def copy_as_replacing(client, sf: int, db: str, tables: list[str] | None = None) -> None:
+    """Copy sf<N> tables (default: all) into db as ReplacingMergeTree, version 0, not deleted."""
+    for stmt in read_sql("clickhouse_tables.sql"):
+        t = stmt.split()[2]
+        if tables is None or t in tables:
+            client.command(replacing_ddl(stmt), settings={"database": db})
+            client.command(f"INSERT INTO {db}.{t} SELECT *, 0, 0 FROM sf{sf}.{t}")
+
+
 def build_replacing(sf: int) -> float:
     """Rebuild sf<N>_rmt: every sf<N> table as ReplacingMergeTree (version 0, not
     deleted), then wait for merges as the loader does. Returns seconds taken."""
@@ -107,10 +116,7 @@ def build_replacing(sf: int) -> float:
                                            settings={"max_execution_time": TIMEOUT_S})
     client.command(f"DROP DATABASE IF EXISTS {db} SYNC")
     client.command(f"CREATE DATABASE {db}")
-    for stmt in read_sql("clickhouse_tables.sql"):
-        t = stmt.split()[2]
-        client.command(replacing_ddl(stmt), settings={"database": db})
-        client.command(f"INSERT INTO {db}.{t} SELECT *, 0, 0 FROM sf{sf}.{t}")
+    copy_as_replacing(client, sf, db)
     wait_for_merges(client, db)
     return round(time.perf_counter() - t0, 1)
 

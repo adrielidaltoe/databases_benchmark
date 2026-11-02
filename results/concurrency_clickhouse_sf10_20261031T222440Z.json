@@ -1,0 +1,5029 @@
+{
+ "engine": "clickhouse",
+ "sf": 10,
+ "timestamp": "20261031T222440Z",
+ "timeout_s": 1800,
+ "best_versions_from": "queries_clickhouse_rmt_sf10_20261030T144718Z.json",
+ "query_settings": {
+  "final": 1
+ },
+ "best_versions": {
+  "q01": {
+   "variant": "original",
+   "warm_s": 5.784,
+   "cold_s": 6.489
+  },
+  "q02": {
+   "variant": "original",
+   "warm_s": 1.331,
+   "cold_s": 1.646
+  },
+  "q03": {
+   "variant": "tuned",
+   "warm_s": 9.361,
+   "cold_s": 8.944
+  },
+  "q04": {
+   "variant": "original",
+   "warm_s": 3.389,
+   "cold_s": 4.321
+  },
+  "q05": {
+   "variant": "tuned",
+   "warm_s": 24.507,
+   "cold_s": 19.37
+  },
+  "q06": {
+   "variant": "original",
+   "warm_s": 0.674,
+   "cold_s": 0.733
+  },
+  "q07": {
+   "variant": "original",
+   "warm_s": 11.929,
+   "cold_s": 11.101
+  },
+  "q08": {
+   "variant": "tuned",
+   "warm_s": 25.552,
+   "cold_s": 40.52
+  },
+  "q09": {
+   "variant": "tuned",
+   "warm_s": 38.281,
+   "cold_s": 54.505
+  },
+  "q10": {
+   "variant": "original",
+   "warm_s": 8.67,
+   "cold_s": 9.196
+  },
+  "q11": {
+   "variant": "original",
+   "warm_s": 1.126,
+   "cold_s": 1.572
+  },
+  "q12": {
+   "variant": "original",
+   "warm_s": 2.594,
+   "cold_s": 3.193
+  },
+  "q13": {
+   "variant": "original",
+   "warm_s": 4.934,
+   "cold_s": 13.728
+  },
+  "q14": {
+   "variant": "original",
+   "warm_s": 0.203,
+   "cold_s": 0.346
+  },
+  "q15": {
+   "variant": "original",
+   "warm_s": 0.36,
+   "cold_s": 0.45
+  },
+  "q16": {
+   "variant": "original",
+   "warm_s": 0.634,
+   "cold_s": 1.046
+  },
+  "q17": {
+   "variant": "rewritten",
+   "warm_s": 6.497,
+   "cold_s": 6.667
+  },
+  "q18": {
+   "variant": "original",
+   "warm_s": 11.52,
+   "cold_s": 12.27
+  },
+  "q19": {
+   "variant": "original",
+   "warm_s": 4.298,
+   "cold_s": 5.649
+  },
+  "q20": {
+   "variant": "original",
+   "warm_s": 0.862,
+   "cold_s": 1.229
+  },
+  "q21": {
+   "variant": "rewritten",
+   "warm_s": 27.41,
+   "cold_s": 43.354
+  },
+  "q22": {
+   "variant": "original",
+   "warm_s": 0.917,
+   "cold_s": 1.218
+  }
+ },
+ "correction_scenarios": [
+  "insert_batch",
+  "insert_small",
+  "update_point",
+  "update_100",
+  "update_1k",
+  "update_10k",
+  "delete_point",
+  "delete_100",
+  "delete_1k",
+  "upsert_1k"
+ ],
+ "version": "25.8.33.6",
+ "settings": {
+  "cancel_http_readonly_queries_on_client_close": "1",
+  "cast_string_to_dynamic_use_inference": "1",
+  "date_time_input_format": "best_effort",
+  "enable_http_compression": "1",
+  "http_headers_progress_interval_ms": "120000",
+  "max_bytes_before_external_group_by": "1500000000",
+  "max_bytes_before_external_sort": "1500000000",
+  "max_execution_time": "1800",
+  "max_memory_usage": "3000000000",
+  "max_threads": "3",
+  "send_progress_in_http_headers": "1"
+ },
+ "levels": [
+  {
+   "streams": 1,
+   "setup_s": 264.6,
+   "wall_s": 223.1,
+   "status": "ok",
+   "resources": {
+    "cpu_s": 565.455,
+    "peak_mem_mb": 4096.0,
+    "peak_anon_mb": 2968.2,
+    "read_mb": 10077.6,
+    "write_mb": 2072.4,
+    "avg_cores": 2.53
+   },
+   "queries": [
+    {
+     "stream": 1,
+     "seq": 1,
+     "query": "q21",
+     "variant": "rewritten",
+     "start_s": 0.019,
+     "status": "ok",
+     "rows": 100,
+     "s": 40.064,
+     "slowdown": 1.462
+    },
+    {
+     "stream": 1,
+     "seq": 2,
+     "query": "q03",
+     "variant": "tuned",
+     "start_s": 40.083,
+     "status": "ok",
+     "rows": 10,
+     "s": 10.098,
+     "slowdown": 1.079
+    },
+    {
+     "stream": 1,
+     "seq": 3,
+     "query": "q18",
+     "variant": "original",
+     "start_s": 50.181,
+     "status": "ok",
+     "rows": 100,
+     "s": 14.688,
+     "slowdown": 1.275
+    },
+    {
+     "stream": 1,
+     "seq": 4,
+     "query": "q05",
+     "variant": "tuned",
+     "start_s": 64.869,
+     "status": "ok",
+     "rows": 5,
+     "s": 21.978,
+     "slowdown": 0.897
+    },
+    {
+     "stream": 1,
+     "seq": 5,
+     "query": "q11",
+     "variant": "original",
+     "start_s": 86.847,
+     "status": "ok",
+     "rows": 0,
+     "s": 1.341,
+     "slowdown": 1.191
+    },
+    {
+     "stream": 1,
+     "seq": 6,
+     "query": "q07",
+     "variant": "original",
+     "start_s": 88.188,
+     "status": "ok",
+     "rows": 4,
+     "s": 11.875,
+     "slowdown": 0.995
+    },
+    {
+     "stream": 1,
+     "seq": 7,
+     "query": "q06",
+     "variant": "original",
+     "start_s": 100.063,
+     "status": "ok",
+     "rows": 1,
+     "s": 0.83,
+     "slowdown": 1.231
+    },
+    {
+     "stream": 1,
+     "seq": 8,
+     "query": "q20",
+     "variant": "original",
+     "start_s": 100.893,
+     "status": "ok",
+     "rows": 1804,
+     "s": 1.066,
+     "slowdown": 1.237
+    },
+    {
+     "stream": 1,
+     "seq": 9,
+     "query": "q17",
+     "variant": "rewritten",
+     "start_s": 101.959,
+     "status": "ok",
+     "rows": 1,
+     "s": 9.307,
+     "slowdown": 1.433
+    },
+    {
+     "stream": 1,
+     "seq": 10,
+     "query": "q12",
+     "variant": "original",
+     "start_s": 111.266,
+     "status": "ok",
+     "rows": 2,
+     "s": 7.205,
+     "slowdown": 2.778
+    },
+    {
+     "stream": 1,
+     "seq": 11,
+     "query": "q16",
+     "variant": "original",
+     "start_s": 118.471,
+     "status": "ok",
+     "rows": 27840,
+     "s": 1.064,
+     "slowdown": 1.678
+    },
+    {
+     "stream": 1,
+     "seq": 12,
+     "query": "q15",
+     "variant": "original",
+     "start_s": 119.535,
+     "status": "ok",
+     "rows": 1,
+     "s": 0.431,
+     "slowdown": 1.197
+    },
+    {
+     "stream": 1,
+     "seq": 13,
+     "query": "q13",
+     "variant": "original",
+     "start_s": 119.967,
+     "status": "ok",
+     "rows": 46,
+     "s": 15.519,
+     "slowdown": 3.145
+    },
+    {
+     "stream": 1,
+     "seq": 14,
+     "query": "q10",
+     "variant": "original",
+     "start_s": 135.486,
+     "status": "ok",
+     "rows": 20,
+     "s": 9.487,
+     "slowdown": 1.094
+    },
+    {
+     "stream": 1,
+     "seq": 15,
+     "query": "q02",
+     "variant": "original",
+     "start_s": 144.973,
+     "status": "ok",
+     "rows": 100,
+     "s": 2.296,
+     "slowdown": 1.725
+    },
+    {
+     "stream": 1,
+     "seq": 16,
+     "query": "q08",
+     "variant": "tuned",
+     "start_s": 147.269,
+     "status": "ok",
+     "rows": 2,
+     "s": 39.517,
+     "slowdown": 1.547
+    },
+    {
+     "stream": 1,
+     "seq": 17,
+     "query": "q14",
+     "variant": "original",
+     "start_s": 186.785,
+     "status": "ok",
+     "rows": 1,
+     "s": 0.373,
+     "slowdown": 1.837
+    },
+    {
+     "stream": 1,
+     "seq": 18,
+     "query": "q19",
+     "variant": "original",
+     "start_s": 187.158,
+     "status": "ok",
+     "rows": 1,
+     "s": 6.237,
+     "slowdown": 1.451
+    },
+    {
+     "stream": 1,
+     "seq": 19,
+     "query": "q09",
+     "variant": "tuned",
+     "start_s": 193.395,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.08 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 15.139
+    },
+    {
+     "stream": 1,
+     "seq": 20,
+     "query": "q22",
+     "variant": "original",
+     "start_s": 208.534,
+     "status": "ok",
+     "rows": 7,
+     "s": 1.865,
+     "slowdown": 2.034
+    },
+    {
+     "stream": 1,
+     "seq": 21,
+     "query": "q01",
+     "variant": "original",
+     "start_s": 210.399,
+     "status": "ok",
+     "rows": 4,
+     "s": 7.772,
+     "slowdown": 1.344
+    },
+    {
+     "stream": 1,
+     "seq": 22,
+     "query": "q04",
+     "variant": "original",
+     "start_s": 218.171,
+     "status": "ok",
+     "rows": 5,
+     "s": 4.94,
+     "slowdown": 1.458
+    }
+   ],
+   "corrections": [
+    {
+     "set": 1,
+     "scenario": "insert_batch",
+     "units": 15000,
+     "start_s": 0.001,
+     "status": "ok",
+     "s": 0.227
+    },
+    {
+     "set": 1,
+     "scenario": "insert_small",
+     "units": 100,
+     "start_s": 0.228,
+     "status": "ok",
+     "s": 2.427
+    },
+    {
+     "set": 1,
+     "scenario": "update_point",
+     "units": 1,
+     "start_s": 2.655,
+     "status": "ok",
+     "s": 0.009
+    },
+    {
+     "set": 1,
+     "scenario": "update_100",
+     "units": 100,
+     "start_s": 2.664,
+     "status": "ok",
+     "s": 0.061
+    },
+    {
+     "set": 1,
+     "scenario": "update_1k",
+     "units": 1000,
+     "start_s": 2.725,
+     "status": "ok",
+     "s": 0.026
+    },
+    {
+     "set": 1,
+     "scenario": "update_10k",
+     "units": 10000,
+     "start_s": 2.751,
+     "status": "ok",
+     "s": 0.07
+    },
+    {
+     "set": 1,
+     "scenario": "delete_point",
+     "units": 1,
+     "start_s": 2.82,
+     "status": "ok",
+     "s": 0.016
+    },
+    {
+     "set": 1,
+     "scenario": "delete_100",
+     "units": 100,
+     "start_s": 2.836,
+     "status": "ok",
+     "s": 0.064
+    },
+    {
+     "set": 1,
+     "scenario": "delete_1k",
+     "units": 1000,
+     "start_s": 2.9,
+     "status": "ok",
+     "s": 0.133
+    },
+    {
+     "set": 1,
+     "scenario": "upsert_1k",
+     "units": 1000,
+     "start_s": 3.033,
+     "status": "ok",
+     "s": 0.071
+    }
+   ],
+   "summary": {
+    "queries": 22,
+    "ok": 21,
+    "failed": 1,
+    "queries_per_hour": 338.9,
+    "slowdown_geomean": 1.45,
+    "slowdown_p95": 2.78,
+    "corrections_s": 3.1,
+    "corrections_done_s": 3.1,
+    "corrections_failed": 0,
+    "failures": [
+     "q09 memory_limit"
+    ]
+   }
+  },
+  {
+   "streams": 2,
+   "setup_s": 293.7,
+   "wall_s": 504.9,
+   "status": "ok",
+   "resources": {
+    "cpu_s": 1218.412,
+    "peak_mem_mb": 4096.0,
+    "peak_anon_mb": 3307.5,
+    "read_mb": 23101.7,
+    "write_mb": 6794.1,
+    "avg_cores": 2.41
+   },
+   "queries": [
+    {
+     "stream": 1,
+     "seq": 1,
+     "query": "q21",
+     "variant": "rewritten",
+     "start_s": 0.029,
+     "status": "ok",
+     "rows": 100,
+     "s": 60.262,
+     "slowdown": 2.199
+    },
+    {
+     "stream": 1,
+     "seq": 2,
+     "query": "q03",
+     "variant": "tuned",
+     "start_s": 60.29,
+     "status": "ok",
+     "rows": 10,
+     "s": 29.983,
+     "slowdown": 3.203
+    },
+    {
+     "stream": 1,
+     "seq": 3,
+     "query": "q18",
+     "variant": "original",
+     "start_s": 90.274,
+     "status": "ok",
+     "rows": 100,
+     "s": 63.817,
+     "slowdown": 5.54
+    },
+    {
+     "stream": 1,
+     "seq": 4,
+     "query": "q05",
+     "variant": "tuned",
+     "start_s": 154.091,
+     "status": "ok",
+     "rows": 5,
+     "s": 72.482,
+     "slowdown": 2.958
+    },
+    {
+     "stream": 1,
+     "seq": 5,
+     "query": "q11",
+     "variant": "original",
+     "start_s": 226.573,
+     "status": "ok",
+     "rows": 0,
+     "s": 2.61,
+     "slowdown": 2.318
+    },
+    {
+     "stream": 1,
+     "seq": 6,
+     "query": "q07",
+     "variant": "original",
+     "start_s": 229.183,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.01 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 4.857
+    },
+    {
+     "stream": 1,
+     "seq": 7,
+     "query": "q06",
+     "variant": "original",
+     "start_s": 234.041,
+     "status": "ok",
+     "rows": 1,
+     "s": 1.584,
+     "slowdown": 2.35
+    },
+    {
+     "stream": 1,
+     "seq": 8,
+     "query": "q20",
+     "variant": "original",
+     "start_s": 235.625,
+     "status": "ok",
+     "rows": 1804,
+     "s": 3.047,
+     "slowdown": 3.535
+    },
+    {
+     "stream": 1,
+     "seq": 9,
+     "query": "q17",
+     "variant": "rewritten",
+     "start_s": 238.672,
+     "status": "ok",
+     "rows": 1,
+     "s": 16.257,
+     "slowdown": 2.502
+    },
+    {
+     "stream": 1,
+     "seq": 10,
+     "query": "q12",
+     "variant": "original",
+     "start_s": 254.929,
+     "status": "ok",
+     "rows": 2,
+     "s": 8.767,
+     "slowdown": 3.38
+    },
+    {
+     "stream": 1,
+     "seq": 11,
+     "query": "q16",
+     "variant": "original",
+     "start_s": 263.696,
+     "status": "ok",
+     "rows": 27840,
+     "s": 2.123,
+     "slowdown": 3.349
+    },
+    {
+     "stream": 1,
+     "seq": 12,
+     "query": "q15",
+     "variant": "original",
+     "start_s": 265.819,
+     "status": "ok",
+     "rows": 1,
+     "s": 1.22,
+     "slowdown": 3.389
+    },
+    {
+     "stream": 1,
+     "seq": 13,
+     "query": "q13",
+     "variant": "original",
+     "start_s": 267.039,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 5.94 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 18.582
+    },
+    {
+     "stream": 1,
+     "seq": 14,
+     "query": "q10",
+     "variant": "original",
+     "start_s": 285.622,
+     "status": "ok",
+     "rows": 20,
+     "s": 33.695,
+     "slowdown": 3.886
+    },
+    {
+     "stream": 1,
+     "seq": 15,
+     "query": "q02",
+     "variant": "original",
+     "start_s": 319.316,
+     "status": "ok",
+     "rows": 100,
+     "s": 11.677,
+     "slowdown": 8.773
+    },
+    {
+     "stream": 1,
+     "seq": 16,
+     "query": "q08",
+     "variant": "tuned",
+     "start_s": 330.993,
+     "status": "ok",
+     "rows": 2,
+     "s": 46.849,
+     "slowdown": 1.833
+    },
+    {
+     "stream": 1,
+     "seq": 17,
+     "query": "q14",
+     "variant": "original",
+     "start_s": 377.842,
+     "status": "ok",
+     "rows": 1,
+     "s": 0.657,
+     "slowdown": 3.236
+    },
+    {
+     "stream": 1,
+     "seq": 18,
+     "query": "q19",
+     "variant": "original",
+     "start_s": 378.5,
+     "status": "ok",
+     "rows": 1,
+     "s": 13.072,
+     "slowdown": 3.041
+    },
+    {
+     "stream": 1,
+     "seq": 19,
+     "query": "q09",
+     "variant": "tuned",
+     "start_s": 391.572,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.00 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 79.334
+    },
+    {
+     "stream": 1,
+     "seq": 20,
+     "query": "q22",
+     "variant": "original",
+     "start_s": 470.907,
+     "status": "ok",
+     "rows": 7,
+     "s": 3.554,
+     "slowdown": 3.876
+    },
+    {
+     "stream": 1,
+     "seq": 21,
+     "query": "q01",
+     "variant": "original",
+     "start_s": 474.46,
+     "status": "ok",
+     "rows": 4,
+     "s": 16.523,
+     "slowdown": 2.857
+    },
+    {
+     "stream": 1,
+     "seq": 22,
+     "query": "q04",
+     "variant": "original",
+     "start_s": 490.984,
+     "status": "ok",
+     "rows": 5,
+     "s": 9.546,
+     "slowdown": 2.817
+    },
+    {
+     "stream": 2,
+     "seq": 1,
+     "query": "q06",
+     "variant": "original",
+     "start_s": 0.027,
+     "status": "ok",
+     "rows": 1,
+     "s": 1.81,
+     "slowdown": 2.685
+    },
+    {
+     "stream": 2,
+     "seq": 2,
+     "query": "q17",
+     "variant": "rewritten",
+     "start_s": 1.837,
+     "status": "ok",
+     "rows": 1,
+     "s": 23.101,
+     "slowdown": 3.556
+    },
+    {
+     "stream": 2,
+     "seq": 3,
+     "query": "q14",
+     "variant": "original",
+     "start_s": 24.938,
+     "status": "ok",
+     "rows": 1,
+     "s": 0.894,
+     "slowdown": 4.404
+    },
+    {
+     "stream": 2,
+     "seq": 4,
+     "query": "q16",
+     "variant": "original",
+     "start_s": 25.832,
+     "status": "ok",
+     "rows": 27840,
+     "s": 2.055,
+     "slowdown": 3.241
+    },
+    {
+     "stream": 2,
+     "seq": 5,
+     "query": "q19",
+     "variant": "original",
+     "start_s": 27.887,
+     "status": "ok",
+     "rows": 1,
+     "s": 24.461,
+     "slowdown": 5.691
+    },
+    {
+     "stream": 2,
+     "seq": 6,
+     "query": "q10",
+     "variant": "original",
+     "start_s": 52.348,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.32 GiB (attempt to allocate chunk of 131.22 MiB bytes), current RSS: 3.19 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracke",
+     "s": 12.486
+    },
+    {
+     "stream": 2,
+     "seq": 7,
+     "query": "q09",
+     "variant": "tuned",
+     "start_s": 64.834,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.00 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 105.937
+    },
+    {
+     "stream": 2,
+     "seq": 8,
+     "query": "q02",
+     "variant": "original",
+     "start_s": 170.772,
+     "status": "ok",
+     "rows": 100,
+     "s": 18.687,
+     "slowdown": 14.04
+    },
+    {
+     "stream": 2,
+     "seq": 9,
+     "query": "q15",
+     "variant": "original",
+     "start_s": 189.458,
+     "status": "ok",
+     "rows": 1,
+     "s": 1.12,
+     "slowdown": 3.111
+    },
+    {
+     "stream": 2,
+     "seq": 10,
+     "query": "q08",
+     "variant": "tuned",
+     "start_s": 190.578,
+     "status": "ok",
+     "rows": 2,
+     "s": 57.589,
+     "slowdown": 2.254
+    },
+    {
+     "stream": 2,
+     "seq": 11,
+     "query": "q05",
+     "variant": "tuned",
+     "start_s": 248.168,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.06 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 12.954
+    },
+    {
+     "stream": 2,
+     "seq": 12,
+     "query": "q22",
+     "variant": "original",
+     "start_s": 261.122,
+     "status": "ok",
+     "rows": 7,
+     "s": 2.969,
+     "slowdown": 3.238
+    },
+    {
+     "stream": 2,
+     "seq": 13,
+     "query": "q12",
+     "variant": "original",
+     "start_s": 264.092,
+     "status": "ok",
+     "rows": 2,
+     "s": 6.2,
+     "slowdown": 2.39
+    },
+    {
+     "stream": 2,
+     "seq": 14,
+     "query": "q07",
+     "variant": "original",
+     "start_s": 270.292,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.00 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 5.138
+    },
+    {
+     "stream": 2,
+     "seq": 15,
+     "query": "q13",
+     "variant": "original",
+     "start_s": 275.429,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 5.94 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 26.057
+    },
+    {
+     "stream": 2,
+     "seq": 16,
+     "query": "q18",
+     "variant": "original",
+     "start_s": 301.487,
+     "status": "ok",
+     "rows": 100,
+     "s": 55.872,
+     "slowdown": 4.85
+    },
+    {
+     "stream": 2,
+     "seq": 17,
+     "query": "q01",
+     "variant": "original",
+     "start_s": 357.359,
+     "status": "ok",
+     "rows": 4,
+     "s": 14.532,
+     "slowdown": 2.512
+    },
+    {
+     "stream": 2,
+     "seq": 18,
+     "query": "q04",
+     "variant": "original",
+     "start_s": 371.891,
+     "status": "ok",
+     "rows": 5,
+     "s": 10.174,
+     "slowdown": 3.002
+    },
+    {
+     "stream": 2,
+     "seq": 19,
+     "query": "q20",
+     "variant": "original",
+     "start_s": 382.066,
+     "status": "ok",
+     "rows": 1804,
+     "s": 2.794,
+     "slowdown": 3.241
+    },
+    {
+     "stream": 2,
+     "seq": 20,
+     "query": "q03",
+     "variant": "tuned",
+     "start_s": 384.86,
+     "status": "ok",
+     "rows": 10,
+     "s": 19.79,
+     "slowdown": 2.114
+    },
+    {
+     "stream": 2,
+     "seq": 21,
+     "query": "q11",
+     "variant": "original",
+     "start_s": 404.651,
+     "status": "ok",
+     "rows": 0,
+     "s": 3.115,
+     "slowdown": 2.766
+    },
+    {
+     "stream": 2,
+     "seq": 22,
+     "query": "q21",
+     "variant": "rewritten",
+     "start_s": 407.766,
+     "status": "ok",
+     "rows": 100,
+     "s": 97.144,
+     "slowdown": 3.544
+    }
+   ],
+   "corrections": [
+    {
+     "set": 1,
+     "scenario": "insert_batch",
+     "units": 15000,
+     "start_s": 0.002,
+     "status": "ok",
+     "s": 0.355
+    },
+    {
+     "set": 1,
+     "scenario": "insert_small",
+     "units": 100,
+     "start_s": 0.356,
+     "status": "ok",
+     "s": 3.604
+    },
+    {
+     "set": 1,
+     "scenario": "update_point",
+     "units": 1,
+     "start_s": 3.961,
+     "status": "ok",
+     "s": 0.017
+    },
+    {
+     "set": 1,
+     "scenario": "update_100",
+     "units": 100,
+     "start_s": 3.978,
+     "status": "ok",
+     "s": 0.062
+    },
+    {
+     "set": 1,
+     "scenario": "update_1k",
+     "units": 1000,
+     "start_s": 4.04,
+     "status": "ok",
+     "s": 0.05
+    },
+    {
+     "set": 1,
+     "scenario": "update_10k",
+     "units": 10000,
+     "start_s": 4.09,
+     "status": "ok",
+     "s": 0.072
+    },
+    {
+     "set": 1,
+     "scenario": "delete_point",
+     "units": 1,
+     "start_s": 4.162,
+     "status": "ok",
+     "s": 0.03
+    },
+    {
+     "set": 1,
+     "scenario": "delete_100",
+     "units": 100,
+     "start_s": 4.192,
+     "status": "ok",
+     "s": 0.103
+    },
+    {
+     "set": 1,
+     "scenario": "delete_1k",
+     "units": 1000,
+     "start_s": 4.294,
+     "status": "ok",
+     "s": 0.155
+    },
+    {
+     "set": 1,
+     "scenario": "upsert_1k",
+     "units": 1000,
+     "start_s": 4.45,
+     "status": "ok",
+     "s": 0.1
+    },
+    {
+     "set": 2,
+     "scenario": "insert_batch",
+     "units": 15000,
+     "start_s": 4.549,
+     "status": "ok",
+     "s": 0.443
+    },
+    {
+     "set": 2,
+     "scenario": "insert_small",
+     "units": 100,
+     "start_s": 4.992,
+     "status": "ok",
+     "s": 4.994
+    },
+    {
+     "set": 2,
+     "scenario": "update_point",
+     "units": 1,
+     "start_s": 9.986,
+     "status": "ok",
+     "s": 0.038
+    },
+    {
+     "set": 2,
+     "scenario": "update_100",
+     "units": 100,
+     "start_s": 10.025,
+     "status": "ok",
+     "s": 0.052
+    },
+    {
+     "set": 2,
+     "scenario": "update_1k",
+     "units": 1000,
+     "start_s": 10.076,
+     "status": "ok",
+     "s": 0.077
+    },
+    {
+     "set": 2,
+     "scenario": "update_10k",
+     "units": 10000,
+     "start_s": 10.153,
+     "status": "ok",
+     "s": 0.121
+    },
+    {
+     "set": 2,
+     "scenario": "delete_point",
+     "units": 1,
+     "start_s": 10.274,
+     "status": "ok",
+     "s": 0.026
+    },
+    {
+     "set": 2,
+     "scenario": "delete_100",
+     "units": 100,
+     "start_s": 10.3,
+     "status": "ok",
+     "s": 0.136
+    },
+    {
+     "set": 2,
+     "scenario": "delete_1k",
+     "units": 1000,
+     "start_s": 10.436,
+     "status": "ok",
+     "s": 0.158
+    },
+    {
+     "set": 2,
+     "scenario": "upsert_1k",
+     "units": 1000,
+     "start_s": 10.594,
+     "status": "ok",
+     "s": 0.085
+    }
+   ],
+   "summary": {
+    "queries": 44,
+    "ok": 36,
+    "failed": 8,
+    "queries_per_hour": 256.7,
+    "slowdown_geomean": 3.32,
+    "slowdown_p95": 6.46,
+    "corrections_s": 10.7,
+    "corrections_done_s": 10.7,
+    "corrections_failed": 0,
+    "failures": [
+     "q05 memory_limit",
+     "q07 memory_limit",
+     "q09 memory_limit",
+     "q10 memory_limit",
+     "q13 memory_limit"
+    ]
+   }
+  },
+  {
+   "streams": 4,
+   "setup_s": 226.1,
+   "wall_s": 816.4,
+   "status": "ok",
+   "resources": {
+    "cpu_s": 2093.441,
+    "peak_mem_mb": 4096.3,
+    "peak_anon_mb": 3332.0,
+    "read_mb": 40329.6,
+    "write_mb": 9441.1,
+    "avg_cores": 2.56
+   },
+   "queries": [
+    {
+     "stream": 1,
+     "seq": 1,
+     "query": "q21",
+     "variant": "rewritten",
+     "start_s": 0.036,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 8.00 MiB bytes), current RSS: 3.25 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 12.129
+    },
+    {
+     "stream": 1,
+     "seq": 2,
+     "query": "q03",
+     "variant": "tuned",
+     "start_s": 12.166,
+     "status": "ok",
+     "rows": 10,
+     "s": 74.124,
+     "slowdown": 7.918
+    },
+    {
+     "stream": 1,
+     "seq": 3,
+     "query": "q18",
+     "variant": "original",
+     "start_s": 86.29,
+     "status": "ok",
+     "rows": 100,
+     "s": 94.904,
+     "slowdown": 8.238
+    },
+    {
+     "stream": 1,
+     "seq": 4,
+     "query": "q05",
+     "variant": "tuned",
+     "start_s": 181.194,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.00 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 71.823
+    },
+    {
+     "stream": 1,
+     "seq": 5,
+     "query": "q11",
+     "variant": "original",
+     "start_s": 253.017,
+     "status": "ok",
+     "rows": 0,
+     "s": 15.364,
+     "slowdown": 13.645
+    },
+    {
+     "stream": 1,
+     "seq": 6,
+     "query": "q07",
+     "variant": "original",
+     "start_s": 268.382,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 6.00 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 22.378
+    },
+    {
+     "stream": 1,
+     "seq": 7,
+     "query": "q06",
+     "variant": "original",
+     "start_s": 290.76,
+     "status": "ok",
+     "rows": 1,
+     "s": 6.828,
+     "slowdown": 10.131
+    },
+    {
+     "stream": 1,
+     "seq": 8,
+     "query": "q20",
+     "variant": "original",
+     "start_s": 297.588,
+     "status": "ok",
+     "rows": 1804,
+     "s": 7.012,
+     "slowdown": 8.135
+    },
+    {
+     "stream": 1,
+     "seq": 9,
+     "query": "q17",
+     "variant": "rewritten",
+     "start_s": 304.6,
+     "status": "ok",
+     "rows": 1,
+     "s": 67.985,
+     "slowdown": 10.464
+    },
+    {
+     "stream": 1,
+     "seq": 10,
+     "query": "q12",
+     "variant": "original",
+     "start_s": 372.585,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.30 GiB (attempt to allocate chunk of 7.98 MiB bytes), current RSS: 3.30 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 9.087
+    },
+    {
+     "stream": 1,
+     "seq": 11,
+     "query": "q16",
+     "variant": "original",
+     "start_s": 381.672,
+     "status": "ok",
+     "rows": 27840,
+     "s": 6.385,
+     "slowdown": 10.071
+    },
+    {
+     "stream": 1,
+     "seq": 12,
+     "query": "q15",
+     "variant": "original",
+     "start_s": 388.058,
+     "status": "ok",
+     "rows": 1,
+     "s": 11.36,
+     "slowdown": 31.556
+    },
+    {
+     "stream": 1,
+     "seq": 13,
+     "query": "q13",
+     "variant": "original",
+     "start_s": 399.418,
+     "status": "ok",
+     "rows": 46,
+     "s": 57.202,
+     "slowdown": 11.593
+    },
+    {
+     "stream": 1,
+     "seq": 14,
+     "query": "q10",
+     "variant": "original",
+     "start_s": 456.62,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.06 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 21.221
+    },
+    {
+     "stream": 1,
+     "seq": 15,
+     "query": "q02",
+     "variant": "original",
+     "start_s": 477.841,
+     "status": "ok",
+     "rows": 100,
+     "s": 16.359,
+     "slowdown": 12.291
+    },
+    {
+     "stream": 1,
+     "seq": 16,
+     "query": "q08",
+     "variant": "tuned",
+     "start_s": 494.199,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.29 GiB (attempt to allocate chunk of 4.00 MiB bytes), current RSS: 3.29 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 47.355
+    },
+    {
+     "stream": 1,
+     "seq": 17,
+     "query": "q14",
+     "variant": "original",
+     "start_s": 541.554,
+     "status": "ok",
+     "rows": 1,
+     "s": 2.866,
+     "slowdown": 14.118
+    },
+    {
+     "stream": 1,
+     "seq": 18,
+     "query": "q19",
+     "variant": "original",
+     "start_s": 544.42,
+     "status": "ok",
+     "rows": 1,
+     "s": 25.158,
+     "slowdown": 5.853
+    },
+    {
+     "stream": 1,
+     "seq": 19,
+     "query": "q09",
+     "variant": "tuned",
+     "start_s": 569.578,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.00 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 43.768
+    },
+    {
+     "stream": 1,
+     "seq": 20,
+     "query": "q22",
+     "variant": "original",
+     "start_s": 613.346,
+     "status": "ok",
+     "rows": 7,
+     "s": 13.127,
+     "slowdown": 14.315
+    },
+    {
+     "stream": 1,
+     "seq": 21,
+     "query": "q01",
+     "variant": "original",
+     "start_s": 626.473,
+     "status": "ok",
+     "rows": 4,
+     "s": 61.686,
+     "slowdown": 10.665
+    },
+    {
+     "stream": 1,
+     "seq": 22,
+     "query": "q04",
+     "variant": "original",
+     "start_s": 688.159,
+     "status": "ok",
+     "rows": 5,
+     "s": 16.64,
+     "slowdown": 4.91
+    },
+    {
+     "stream": 2,
+     "seq": 1,
+     "query": "q06",
+     "variant": "original",
+     "start_s": 0.075,
+     "status": "ok",
+     "rows": 1,
+     "s": 2.7,
+     "slowdown": 4.006
+    },
+    {
+     "stream": 2,
+     "seq": 2,
+     "query": "q17",
+     "variant": "rewritten",
+     "start_s": 2.775,
+     "status": "ok",
+     "rows": 1,
+     "s": 43.988,
+     "slowdown": 6.771
+    },
+    {
+     "stream": 2,
+     "seq": 3,
+     "query": "q14",
+     "variant": "original",
+     "start_s": 46.763,
+     "status": "ok",
+     "rows": 1,
+     "s": 5.108,
+     "slowdown": 25.163
+    },
+    {
+     "stream": 2,
+     "seq": 4,
+     "query": "q16",
+     "variant": "original",
+     "start_s": 51.871,
+     "status": "ok",
+     "rows": 27840,
+     "s": 11.516,
+     "slowdown": 18.164
+    },
+    {
+     "stream": 2,
+     "seq": 5,
+     "query": "q19",
+     "variant": "original",
+     "start_s": 63.387,
+     "status": "ok",
+     "rows": 1,
+     "s": 51.563,
+     "slowdown": 11.997
+    },
+    {
+     "stream": 2,
+     "seq": 6,
+     "query": "q10",
+     "variant": "original",
+     "start_s": 114.95,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.29 GiB (attempt to allocate chunk of 4.09 MiB bytes), current RSS: 3.29 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 34.017
+    },
+    {
+     "stream": 2,
+     "seq": 7,
+     "query": "q09",
+     "variant": "tuned",
+     "start_s": 148.967,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.00 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 61.7
+    },
+    {
+     "stream": 2,
+     "seq": 8,
+     "query": "q02",
+     "variant": "original",
+     "start_s": 210.667,
+     "status": "ok",
+     "rows": 100,
+     "s": 17.018,
+     "slowdown": 12.786
+    },
+    {
+     "stream": 2,
+     "seq": 9,
+     "query": "q15",
+     "variant": "original",
+     "start_s": 227.686,
+     "status": "ok",
+     "rows": 1,
+     "s": 3.566,
+     "slowdown": 9.906
+    },
+    {
+     "stream": 2,
+     "seq": 10,
+     "query": "q08",
+     "variant": "tuned",
+     "start_s": 231.252,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.05 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 58.608
+    },
+    {
+     "stream": 2,
+     "seq": 11,
+     "query": "q05",
+     "variant": "tuned",
+     "start_s": 289.861,
+     "status": "ok",
+     "rows": 5,
+     "s": 69.555,
+     "slowdown": 2.838
+    },
+    {
+     "stream": 2,
+     "seq": 12,
+     "query": "q22",
+     "variant": "original",
+     "start_s": 359.416,
+     "status": "ok",
+     "rows": 7,
+     "s": 15.941,
+     "slowdown": 17.384
+    },
+    {
+     "stream": 2,
+     "seq": 13,
+     "query": "q12",
+     "variant": "original",
+     "start_s": 375.358,
+     "status": "timeout",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.31 GiB (attempt to allocate chunk of 4.00 MiB bytes), current RSS: 3.20 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Waiting timeout for memory to be freed is reache",
+     "s": 6.321
+    },
+    {
+     "stream": 2,
+     "seq": 14,
+     "query": "q07",
+     "variant": "original",
+     "start_s": 381.679,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 6.00 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 9.825
+    },
+    {
+     "stream": 2,
+     "seq": 15,
+     "query": "q13",
+     "variant": "original",
+     "start_s": 391.503,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 4.19 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 23.642
+    },
+    {
+     "stream": 2,
+     "seq": 16,
+     "query": "q18",
+     "variant": "original",
+     "start_s": 415.146,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.24 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 59.273
+    },
+    {
+     "stream": 2,
+     "seq": 17,
+     "query": "q01",
+     "variant": "original",
+     "start_s": 474.419,
+     "status": "ok",
+     "rows": 4,
+     "s": 291.536,
+     "slowdown": 50.404
+    },
+    {
+     "stream": 2,
+     "seq": 18,
+     "query": "q04",
+     "variant": "original",
+     "start_s": 765.955,
+     "status": "ok",
+     "rows": 5,
+     "s": 3.764,
+     "slowdown": 1.111
+    },
+    {
+     "stream": 2,
+     "seq": 19,
+     "query": "q20",
+     "variant": "original",
+     "start_s": 769.719,
+     "status": "ok",
+     "rows": 1804,
+     "s": 0.933,
+     "slowdown": 1.082
+    },
+    {
+     "stream": 2,
+     "seq": 20,
+     "query": "q03",
+     "variant": "tuned",
+     "start_s": 770.652,
+     "status": "ok",
+     "rows": 10,
+     "s": 8.36,
+     "slowdown": 0.893
+    },
+    {
+     "stream": 2,
+     "seq": 21,
+     "query": "q11",
+     "variant": "original",
+     "start_s": 779.011,
+     "status": "ok",
+     "rows": 0,
+     "s": 1.272,
+     "slowdown": 1.13
+    },
+    {
+     "stream": 2,
+     "seq": 22,
+     "query": "q21",
+     "variant": "rewritten",
+     "start_s": 780.283,
+     "status": "ok",
+     "rows": 100,
+     "s": 36.132,
+     "slowdown": 1.318
+    },
+    {
+     "stream": 3,
+     "seq": 1,
+     "query": "q08",
+     "variant": "tuned",
+     "start_s": 0.081,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.01 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 31.546
+    },
+    {
+     "stream": 3,
+     "seq": 2,
+     "query": "q05",
+     "variant": "tuned",
+     "start_s": 31.628,
+     "status": "ok",
+     "rows": 5,
+     "s": 159.73,
+     "slowdown": 6.518
+    },
+    {
+     "stream": 3,
+     "seq": 3,
+     "query": "q04",
+     "variant": "original",
+     "start_s": 191.359,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.05 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 33.788
+    },
+    {
+     "stream": 3,
+     "seq": 4,
+     "query": "q06",
+     "variant": "original",
+     "start_s": 225.147,
+     "status": "ok",
+     "rows": 1,
+     "s": 4.617,
+     "slowdown": 6.85
+    },
+    {
+     "stream": 3,
+     "seq": 5,
+     "query": "q17",
+     "variant": "rewritten",
+     "start_s": 229.764,
+     "status": "ok",
+     "rows": 1,
+     "s": 57.256,
+     "slowdown": 8.813
+    },
+    {
+     "stream": 3,
+     "seq": 6,
+     "query": "q07",
+     "variant": "original",
+     "start_s": 287.02,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.02 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 9.641
+    },
+    {
+     "stream": 3,
+     "seq": 7,
+     "query": "q01",
+     "variant": "original",
+     "start_s": 296.661,
+     "status": "ok",
+     "rows": 4,
+     "s": 32.195,
+     "slowdown": 5.566
+    },
+    {
+     "stream": 3,
+     "seq": 8,
+     "query": "q18",
+     "variant": "original",
+     "start_s": 328.856,
+     "status": "ok",
+     "rows": 100,
+     "s": 109.123,
+     "slowdown": 9.472
+    },
+    {
+     "stream": 3,
+     "seq": 9,
+     "query": "q22",
+     "variant": "original",
+     "start_s": 437.979,
+     "status": "ok",
+     "rows": 7,
+     "s": 9.617,
+     "slowdown": 10.487
+    },
+    {
+     "stream": 3,
+     "seq": 10,
+     "query": "q14",
+     "variant": "original",
+     "start_s": 447.596,
+     "status": "ok",
+     "rows": 1,
+     "s": 2.738,
+     "slowdown": 13.488
+    },
+    {
+     "stream": 3,
+     "seq": 11,
+     "query": "q09",
+     "variant": "tuned",
+     "start_s": 450.334,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.05 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 51.921
+    },
+    {
+     "stream": 3,
+     "seq": 12,
+     "query": "q10",
+     "variant": "original",
+     "start_s": 502.255,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 63.95 MiB bytes), current RSS: 3.21 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker",
+     "s": 47.779
+    },
+    {
+     "stream": 3,
+     "seq": 13,
+     "query": "q15",
+     "variant": "original",
+     "start_s": 550.034,
+     "status": "ok",
+     "rows": 1,
+     "s": 4.088,
+     "slowdown": 11.356
+    },
+    {
+     "stream": 3,
+     "seq": 14,
+     "query": "q11",
+     "variant": "original",
+     "start_s": 554.122,
+     "status": "ok",
+     "rows": 0,
+     "s": 13.783,
+     "slowdown": 12.241
+    },
+    {
+     "stream": 3,
+     "seq": 15,
+     "query": "q20",
+     "variant": "original",
+     "start_s": 567.906,
+     "status": "ok",
+     "rows": 1804,
+     "s": 5.508,
+     "slowdown": 6.39
+    },
+    {
+     "stream": 3,
+     "seq": 16,
+     "query": "q02",
+     "variant": "original",
+     "start_s": 573.414,
+     "status": "ok",
+     "rows": 100,
+     "s": 6.347,
+     "slowdown": 4.769
+    },
+    {
+     "stream": 3,
+     "seq": 17,
+     "query": "q21",
+     "variant": "rewritten",
+     "start_s": 579.761,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.46 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 107.174
+    },
+    {
+     "stream": 3,
+     "seq": 18,
+     "query": "q19",
+     "variant": "original",
+     "start_s": 686.935,
+     "status": "ok",
+     "rows": 1,
+     "s": 20.373,
+     "slowdown": 4.74
+    },
+    {
+     "stream": 3,
+     "seq": 19,
+     "query": "q13",
+     "variant": "original",
+     "start_s": 707.308,
+     "status": "ok",
+     "rows": 46,
+     "s": 16.973,
+     "slowdown": 3.44
+    },
+    {
+     "stream": 3,
+     "seq": 20,
+     "query": "q16",
+     "variant": "original",
+     "start_s": 724.281,
+     "status": "ok",
+     "rows": 27840,
+     "s": 2.319,
+     "slowdown": 3.658
+    },
+    {
+     "stream": 3,
+     "seq": 21,
+     "query": "q12",
+     "variant": "original",
+     "start_s": 726.6,
+     "status": "ok",
+     "rows": 2,
+     "s": 8.896,
+     "slowdown": 3.429
+    },
+    {
+     "stream": 3,
+     "seq": 22,
+     "query": "q03",
+     "variant": "tuned",
+     "start_s": 735.496,
+     "status": "ok",
+     "rows": 10,
+     "s": 26.675,
+     "slowdown": 2.85
+    },
+    {
+     "stream": 4,
+     "seq": 1,
+     "query": "q05",
+     "variant": "tuned",
+     "start_s": 0.077,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 4.04 MiB bytes), current RSS: 3.28 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 8.589
+    },
+    {
+     "stream": 4,
+     "seq": 2,
+     "query": "q21",
+     "variant": "rewritten",
+     "start_s": 8.666,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.29 GiB (attempt to allocate chunk of 4.08 MiB bytes), current RSS: 3.29 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 126.69
+    },
+    {
+     "stream": 4,
+     "seq": 3,
+     "query": "q14",
+     "variant": "original",
+     "start_s": 135.356,
+     "status": "ok",
+     "rows": 1,
+     "s": 2.396,
+     "slowdown": 11.803
+    },
+    {
+     "stream": 4,
+     "seq": 4,
+     "query": "q19",
+     "variant": "original",
+     "start_s": 137.752,
+     "status": "ok",
+     "rows": 1,
+     "s": 28.725,
+     "slowdown": 6.683
+    },
+    {
+     "stream": 4,
+     "seq": 5,
+     "query": "q15",
+     "variant": "original",
+     "start_s": 166.477,
+     "status": "ok",
+     "rows": 1,
+     "s": 5.513,
+     "slowdown": 15.314
+    },
+    {
+     "stream": 4,
+     "seq": 6,
+     "query": "q17",
+     "variant": "rewritten",
+     "start_s": 171.99,
+     "status": "ok",
+     "rows": 1,
+     "s": 67.011,
+     "slowdown": 10.314
+    },
+    {
+     "stream": 4,
+     "seq": 7,
+     "query": "q12",
+     "variant": "original",
+     "start_s": 239.0,
+     "status": "ok",
+     "rows": 2,
+     "s": 26.007,
+     "slowdown": 10.026
+    },
+    {
+     "stream": 4,
+     "seq": 8,
+     "query": "q06",
+     "variant": "original",
+     "start_s": 265.008,
+     "status": "ok",
+     "rows": 1,
+     "s": 4.89,
+     "slowdown": 7.255
+    },
+    {
+     "stream": 4,
+     "seq": 9,
+     "query": "q04",
+     "variant": "original",
+     "start_s": 269.898,
+     "status": "ok",
+     "rows": 5,
+     "s": 41.623,
+     "slowdown": 12.282
+    },
+    {
+     "stream": 4,
+     "seq": 10,
+     "query": "q09",
+     "variant": "tuned",
+     "start_s": 311.521,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.03 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 65.082
+    },
+    {
+     "stream": 4,
+     "seq": 11,
+     "query": "q08",
+     "variant": "tuned",
+     "start_s": 376.602,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.05 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 44.253
+    },
+    {
+     "stream": 4,
+     "seq": 12,
+     "query": "q16",
+     "variant": "original",
+     "start_s": 420.855,
+     "status": "ok",
+     "rows": 27840,
+     "s": 13.028,
+     "slowdown": 20.549
+    },
+    {
+     "stream": 4,
+     "seq": 13,
+     "query": "q11",
+     "variant": "original",
+     "start_s": 433.886,
+     "status": "ok",
+     "rows": 0,
+     "s": 9.066,
+     "slowdown": 8.052
+    },
+    {
+     "stream": 4,
+     "seq": 14,
+     "query": "q02",
+     "variant": "original",
+     "start_s": 442.953,
+     "status": "ok",
+     "rows": 100,
+     "s": 23.443,
+     "slowdown": 17.613
+    },
+    {
+     "stream": 4,
+     "seq": 15,
+     "query": "q10",
+     "variant": "original",
+     "start_s": 466.396,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.29 GiB (attempt to allocate chunk of 64.00 MiB bytes), current RSS: 3.22 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker",
+     "s": 21.926
+    },
+    {
+     "stream": 4,
+     "seq": 16,
+     "query": "q18",
+     "variant": "original",
+     "start_s": 488.322,
+     "status": "ok",
+     "rows": 100,
+     "s": 85.395,
+     "slowdown": 7.413
+    },
+    {
+     "stream": 4,
+     "seq": 17,
+     "query": "q01",
+     "variant": "original",
+     "start_s": 573.718,
+     "status": "ok",
+     "rows": 4,
+     "s": 38.556,
+     "slowdown": 6.666
+    },
+    {
+     "stream": 4,
+     "seq": 18,
+     "query": "q13",
+     "variant": "original",
+     "start_s": 612.273,
+     "status": "ok",
+     "rows": 46,
+     "s": 60.438,
+     "slowdown": 12.249
+    },
+    {
+     "stream": 4,
+     "seq": 19,
+     "query": "q07",
+     "variant": "original",
+     "start_s": 672.711,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.04 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 17.433
+    },
+    {
+     "stream": 4,
+     "seq": 20,
+     "query": "q22",
+     "variant": "original",
+     "start_s": 690.144,
+     "status": "ok",
+     "rows": 7,
+     "s": 13.318,
+     "slowdown": 14.523
+    },
+    {
+     "stream": 4,
+     "seq": 21,
+     "query": "q03",
+     "variant": "tuned",
+     "start_s": 703.462,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker: W",
+     "s": 24.577
+    },
+    {
+     "stream": 4,
+     "seq": 22,
+     "query": "q20",
+     "variant": "original",
+     "start_s": 728.039,
+     "status": "ok",
+     "rows": 1804,
+     "s": 4.071,
+     "slowdown": 4.723
+    }
+   ],
+   "corrections": [
+    {
+     "set": 1,
+     "scenario": "insert_batch",
+     "units": 15000,
+     "start_s": 0.007,
+     "status": "ok",
+     "s": 0.852
+    },
+    {
+     "set": 1,
+     "scenario": "insert_small",
+     "units": 100,
+     "start_s": 0.859,
+     "status": "ok",
+     "s": 4.93
+    },
+    {
+     "set": 1,
+     "scenario": "update_point",
+     "units": 1,
+     "start_s": 5.789,
+     "status": "ok",
+     "s": 0.023
+    },
+    {
+     "set": 1,
+     "scenario": "update_100",
+     "units": 100,
+     "start_s": 5.812,
+     "status": "ok",
+     "s": 0.089
+    },
+    {
+     "set": 1,
+     "scenario": "update_1k",
+     "units": 1000,
+     "start_s": 5.901,
+     "status": "ok",
+     "s": 0.097
+    },
+    {
+     "set": 1,
+     "scenario": "update_10k",
+     "units": 10000,
+     "start_s": 5.998,
+     "status": "ok",
+     "s": 0.215
+    },
+    {
+     "set": 1,
+     "scenario": "delete_point",
+     "units": 1,
+     "start_s": 6.213,
+     "status": "ok",
+     "s": 0.068
+    },
+    {
+     "set": 1,
+     "scenario": "delete_100",
+     "units": 100,
+     "start_s": 6.28,
+     "status": "ok",
+     "s": 0.196
+    },
+    {
+     "set": 1,
+     "scenario": "delete_1k",
+     "units": 1000,
+     "start_s": 6.476,
+     "status": "ok",
+     "s": 0.134
+    },
+    {
+     "set": 1,
+     "scenario": "upsert_1k",
+     "units": 1000,
+     "start_s": 6.61,
+     "status": "ok",
+     "s": 0.113
+    },
+    {
+     "set": 2,
+     "scenario": "insert_batch",
+     "units": 15000,
+     "start_s": 6.722,
+     "status": "ok",
+     "s": 0.686
+    },
+    {
+     "set": 2,
+     "scenario": "insert_small",
+     "units": 100,
+     "start_s": 7.409,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 64 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 1.083
+    },
+    {
+     "set": 2,
+     "scenario": "update_point",
+     "units": 1,
+     "start_s": 8.491,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 64 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 0.018
+    },
+    {
+     "set": 2,
+     "scenario": "update_100",
+     "units": 100,
+     "start_s": 8.51,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 832 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 0.012
+    },
+    {
+     "set": 2,
+     "scenario": "update_1k",
+     "units": 1000,
+     "start_s": 8.522,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 8000 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123",
+     "s": 0.041
+    },
+    {
+     "set": 2,
+     "scenario": "update_10k",
+     "units": 10000,
+     "start_s": 8.563,
+     "status": "ok",
+     "s": 0.116
+    },
+    {
+     "set": 2,
+     "scenario": "delete_point",
+     "units": 1,
+     "start_s": 8.679,
+     "status": "ok",
+     "s": 0.046
+    },
+    {
+     "set": 2,
+     "scenario": "delete_100",
+     "units": 100,
+     "start_s": 8.725,
+     "status": "ok",
+     "s": 0.193
+    },
+    {
+     "set": 2,
+     "scenario": "delete_1k",
+     "units": 1000,
+     "start_s": 8.918,
+     "status": "ok",
+     "s": 0.24
+    },
+    {
+     "set": 2,
+     "scenario": "upsert_1k",
+     "units": 1000,
+     "start_s": 9.158,
+     "status": "ok",
+     "s": 0.094
+    },
+    {
+     "set": 3,
+     "scenario": "insert_batch",
+     "units": 15000,
+     "start_s": 9.252,
+     "status": "ok",
+     "s": 0.757
+    },
+    {
+     "set": 3,
+     "scenario": "insert_small",
+     "units": 100,
+     "start_s": 10.009,
+     "status": "ok",
+     "s": 5.356
+    },
+    {
+     "set": 3,
+     "scenario": "update_point",
+     "units": 1,
+     "start_s": 15.365,
+     "status": "ok",
+     "s": 0.018
+    },
+    {
+     "set": 3,
+     "scenario": "update_100",
+     "units": 100,
+     "start_s": 15.383,
+     "status": "ok",
+     "s": 0.045
+    },
+    {
+     "set": 3,
+     "scenario": "update_1k",
+     "units": 1000,
+     "start_s": 15.428,
+     "status": "ok",
+     "s": 0.053
+    },
+    {
+     "set": 3,
+     "scenario": "update_10k",
+     "units": 10000,
+     "start_s": 15.481,
+     "status": "ok",
+     "s": 0.113
+    },
+    {
+     "set": 3,
+     "scenario": "delete_point",
+     "units": 1,
+     "start_s": 15.594,
+     "status": "ok",
+     "s": 0.027
+    },
+    {
+     "set": 3,
+     "scenario": "delete_100",
+     "units": 100,
+     "start_s": 15.621,
+     "status": "ok",
+     "s": 0.098
+    },
+    {
+     "set": 3,
+     "scenario": "delete_1k",
+     "units": 1000,
+     "start_s": 15.72,
+     "status": "ok",
+     "s": 0.193
+    },
+    {
+     "set": 3,
+     "scenario": "upsert_1k",
+     "units": 1000,
+     "start_s": 15.913,
+     "status": "ok",
+     "s": 0.137
+    },
+    {
+     "set": 4,
+     "scenario": "insert_batch",
+     "units": 15000,
+     "start_s": 16.05,
+     "status": "ok",
+     "s": 0.838
+    },
+    {
+     "set": 4,
+     "scenario": "insert_small",
+     "units": 100,
+     "start_s": 16.888,
+     "status": "ok",
+     "s": 4.118
+    },
+    {
+     "set": 4,
+     "scenario": "update_point",
+     "units": 1,
+     "start_s": 21.006,
+     "status": "ok",
+     "s": 0.008
+    },
+    {
+     "set": 4,
+     "scenario": "update_100",
+     "units": 100,
+     "start_s": 21.014,
+     "status": "ok",
+     "s": 0.036
+    },
+    {
+     "set": 4,
+     "scenario": "update_1k",
+     "units": 1000,
+     "start_s": 21.05,
+     "status": "ok",
+     "s": 0.064
+    },
+    {
+     "set": 4,
+     "scenario": "update_10k",
+     "units": 10000,
+     "start_s": 21.114,
+     "status": "ok",
+     "s": 0.193
+    },
+    {
+     "set": 4,
+     "scenario": "delete_point",
+     "units": 1,
+     "start_s": 21.307,
+     "status": "ok",
+     "s": 0.042
+    },
+    {
+     "set": 4,
+     "scenario": "delete_100",
+     "units": 100,
+     "start_s": 21.349,
+     "status": "ok",
+     "s": 0.105
+    },
+    {
+     "set": 4,
+     "scenario": "delete_1k",
+     "units": 1000,
+     "start_s": 21.454,
+     "status": "ok",
+     "s": 0.243
+    },
+    {
+     "set": 4,
+     "scenario": "upsert_1k",
+     "units": 1000,
+     "start_s": 21.698,
+     "status": "ok",
+     "s": 0.178
+    }
+   ],
+   "summary": {
+    "queries": 88,
+    "ok": 61,
+    "failed": 27,
+    "queries_per_hour": 269.0,
+    "slowdown_geomean": 7.74,
+    "slowdown_p95": 20.55,
+    "corrections_s": 21.9,
+    "corrections_done_s": 21.9,
+    "corrections_failed": 4,
+    "failures": [
+     "q03 memory_limit",
+     "q04 memory_limit",
+     "q05 memory_limit",
+     "q07 memory_limit",
+     "q08 memory_limit",
+     "q09 memory_limit",
+     "q10 memory_limit",
+     "q12 memory_limit",
+     "q12 timeout",
+     "q13 memory_limit",
+     "q18 memory_limit",
+     "q21 memory_limit"
+    ]
+   }
+  },
+  {
+   "streams": 8,
+   "setup_s": 222.2,
+   "wall_s": 894.4,
+   "status": "ok",
+   "resources": {
+    "cpu_s": 2488.037,
+    "peak_mem_mb": 4096.0,
+    "peak_anon_mb": 3327.4,
+    "read_mb": 38816.1,
+    "write_mb": 7651.8,
+    "avg_cores": 2.78
+   },
+   "queries": [
+    {
+     "stream": 1,
+     "seq": 1,
+     "query": "q21",
+     "variant": "rewritten",
+     "start_s": 0.033,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker: W",
+     "s": 6.04
+    },
+    {
+     "stream": 1,
+     "seq": 2,
+     "query": "q03",
+     "variant": "tuned",
+     "start_s": 6.073,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.00 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 16.811
+    },
+    {
+     "stream": 1,
+     "seq": 3,
+     "query": "q18",
+     "variant": "original",
+     "start_s": 22.884,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 105.646
+    },
+    {
+     "stream": 1,
+     "seq": 4,
+     "query": "q05",
+     "variant": "tuned",
+     "start_s": 128.53,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.05 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 21.162
+    },
+    {
+     "stream": 1,
+     "seq": 5,
+     "query": "q11",
+     "variant": "original",
+     "start_s": 149.692,
+     "status": "ok",
+     "rows": 0,
+     "s": 23.435,
+     "slowdown": 20.813
+    },
+    {
+     "stream": 1,
+     "seq": 6,
+     "query": "q07",
+     "variant": "original",
+     "start_s": 173.127,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 5.86 MiB bytes), current RSS: 3.28 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 15.459
+    },
+    {
+     "stream": 1,
+     "seq": 7,
+     "query": "q06",
+     "variant": "original",
+     "start_s": 188.587,
+     "status": "ok",
+     "rows": 1,
+     "s": 12.37,
+     "slowdown": 18.353
+    },
+    {
+     "stream": 1,
+     "seq": 8,
+     "query": "q20",
+     "variant": "original",
+     "start_s": 200.957,
+     "status": "ok",
+     "rows": 1804,
+     "s": 11.989,
+     "slowdown": 13.908
+    },
+    {
+     "stream": 1,
+     "seq": 9,
+     "query": "q17",
+     "variant": "rewritten",
+     "start_s": 212.946,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.01 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. (MEMORY_LIMIT_EXCEEDED) (version 25.8.33.6 (official build)) (for url http:/",
+     "s": 0.16
+    },
+    {
+     "stream": 1,
+     "seq": 10,
+     "query": "q12",
+     "variant": "original",
+     "start_s": 213.106,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 6.00 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 24.78
+    },
+    {
+     "stream": 1,
+     "seq": 11,
+     "query": "q16",
+     "variant": "original",
+     "start_s": 237.886,
+     "status": "ok",
+     "rows": 27840,
+     "s": 14.462,
+     "slowdown": 22.811
+    },
+    {
+     "stream": 1,
+     "seq": 12,
+     "query": "q15",
+     "variant": "original",
+     "start_s": 252.348,
+     "status": "ok",
+     "rows": 1,
+     "s": 6.878,
+     "slowdown": 19.106
+    },
+    {
+     "stream": 1,
+     "seq": 13,
+     "query": "q13",
+     "variant": "original",
+     "start_s": 259.226,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.02 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 15.762
+    },
+    {
+     "stream": 1,
+     "seq": 14,
+     "query": "q10",
+     "variant": "original",
+     "start_s": 274.987,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.50 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 29.131
+    },
+    {
+     "stream": 1,
+     "seq": 15,
+     "query": "q02",
+     "variant": "original",
+     "start_s": 304.118,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.29 GiB (attempt to allocate chunk of 4.33 MiB bytes), current RSS: 3.28 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 17.867
+    },
+    {
+     "stream": 1,
+     "seq": 16,
+     "query": "q08",
+     "variant": "tuned",
+     "start_s": 321.985,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.30 GiB (attempt to allocate chunk of 4.03 MiB bytes), current RSS: 3.19 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: W",
+     "s": 4.175
+    },
+    {
+     "stream": 1,
+     "seq": 17,
+     "query": "q14",
+     "variant": "original",
+     "start_s": 326.161,
+     "status": "ok",
+     "rows": 1,
+     "s": 2.749,
+     "slowdown": 13.542
+    },
+    {
+     "stream": 1,
+     "seq": 18,
+     "query": "q19",
+     "variant": "original",
+     "start_s": 328.91,
+     "status": "ok",
+     "rows": 1,
+     "s": 49.837,
+     "slowdown": 11.595
+    },
+    {
+     "stream": 1,
+     "seq": 19,
+     "query": "q09",
+     "variant": "tuned",
+     "start_s": 378.747,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.01 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 42.748
+    },
+    {
+     "stream": 1,
+     "seq": 20,
+     "query": "q22",
+     "variant": "original",
+     "start_s": 421.496,
+     "status": "ok",
+     "rows": 7,
+     "s": 20.667,
+     "slowdown": 22.538
+    },
+    {
+     "stream": 1,
+     "seq": 21,
+     "query": "q01",
+     "variant": "original",
+     "start_s": 442.163,
+     "status": "ok",
+     "rows": 4,
+     "s": 447.32,
+     "slowdown": 77.337
+    },
+    {
+     "stream": 1,
+     "seq": 22,
+     "query": "q04",
+     "variant": "original",
+     "start_s": 889.483,
+     "status": "ok",
+     "rows": 5,
+     "s": 4.925,
+     "slowdown": 1.453
+    },
+    {
+     "stream": 2,
+     "seq": 1,
+     "query": "q06",
+     "variant": "original",
+     "start_s": 0.165,
+     "status": "ok",
+     "rows": 1,
+     "s": 3.673,
+     "slowdown": 5.45
+    },
+    {
+     "stream": 2,
+     "seq": 2,
+     "query": "q17",
+     "variant": "rewritten",
+     "start_s": 3.839,
+     "status": "ok",
+     "rows": 1,
+     "s": 79.082,
+     "slowdown": 12.172
+    },
+    {
+     "stream": 2,
+     "seq": 3,
+     "query": "q14",
+     "variant": "original",
+     "start_s": 82.921,
+     "status": "ok",
+     "rows": 1,
+     "s": 9.56,
+     "slowdown": 47.094
+    },
+    {
+     "stream": 2,
+     "seq": 4,
+     "query": "q16",
+     "variant": "original",
+     "start_s": 92.481,
+     "status": "ok",
+     "rows": 27840,
+     "s": 20.583,
+     "slowdown": 32.465
+    },
+    {
+     "stream": 2,
+     "seq": 5,
+     "query": "q19",
+     "variant": "original",
+     "start_s": 113.064,
+     "status": "ok",
+     "rows": 1,
+     "s": 54.445,
+     "slowdown": 12.668
+    },
+    {
+     "stream": 2,
+     "seq": 6,
+     "query": "q10",
+     "variant": "original",
+     "start_s": 167.509,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.50 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 16.975
+    },
+    {
+     "stream": 2,
+     "seq": 7,
+     "query": "q09",
+     "variant": "tuned",
+     "start_s": 184.484,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.29 GiB (attempt to allocate chunk of 4.01 MiB bytes), current RSS: 3.28 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 42.829
+    },
+    {
+     "stream": 2,
+     "seq": 8,
+     "query": "q02",
+     "variant": "original",
+     "start_s": 227.313,
+     "status": "ok",
+     "rows": 100,
+     "s": 26.932,
+     "slowdown": 20.234
+    },
+    {
+     "stream": 2,
+     "seq": 9,
+     "query": "q15",
+     "variant": "original",
+     "start_s": 254.246,
+     "status": "ok",
+     "rows": 1,
+     "s": 7.882,
+     "slowdown": 21.894
+    },
+    {
+     "stream": 2,
+     "seq": 10,
+     "query": "q08",
+     "variant": "tuned",
+     "start_s": 262.128,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.08 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 26.956
+    },
+    {
+     "stream": 2,
+     "seq": 11,
+     "query": "q05",
+     "variant": "tuned",
+     "start_s": 289.084,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.01 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 29.928
+    },
+    {
+     "stream": 2,
+     "seq": 12,
+     "query": "q22",
+     "variant": "original",
+     "start_s": 319.012,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.01 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. (MEMORY_LIMIT_EXCEEDED) (version 25.8.33.6 (official build)) (for url http:/",
+     "s": 0.146
+    },
+    {
+     "stream": 2,
+     "seq": 13,
+     "query": "q12",
+     "variant": "original",
+     "start_s": 319.158,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 4.50 MiB bytes), current RSS: 3.19 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: W",
+     "s": 6.931
+    },
+    {
+     "stream": 2,
+     "seq": 14,
+     "query": "q07",
+     "variant": "original",
+     "start_s": 326.089,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 4.04 MiB bytes), current RSS: 3.28 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 10.428
+    },
+    {
+     "stream": 2,
+     "seq": 15,
+     "query": "q13",
+     "variant": "original",
+     "start_s": 336.518,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.10 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 19.469
+    },
+    {
+     "stream": 2,
+     "seq": 16,
+     "query": "q18",
+     "variant": "original",
+     "start_s": 355.986,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 59.718
+    },
+    {
+     "stream": 2,
+     "seq": 17,
+     "query": "q01",
+     "variant": "original",
+     "start_s": 415.704,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 55.093
+    },
+    {
+     "stream": 2,
+     "seq": 18,
+     "query": "q04",
+     "variant": "original",
+     "start_s": 470.797,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 4.06 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 25.68
+    },
+    {
+     "stream": 2,
+     "seq": 19,
+     "query": "q20",
+     "variant": "original",
+     "start_s": 496.477,
+     "status": "ok",
+     "rows": 1804,
+     "s": 11.273,
+     "slowdown": 13.078
+    },
+    {
+     "stream": 2,
+     "seq": 20,
+     "query": "q03",
+     "variant": "tuned",
+     "start_s": 507.751,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker: W",
+     "s": 107.431
+    },
+    {
+     "stream": 2,
+     "seq": 21,
+     "query": "q11",
+     "variant": "original",
+     "start_s": 615.182,
+     "status": "ok",
+     "rows": 0,
+     "s": 18.369,
+     "slowdown": 16.313
+    },
+    {
+     "stream": 2,
+     "seq": 22,
+     "query": "q21",
+     "variant": "rewritten",
+     "start_s": 633.551,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.29 GiB (attempt to allocate chunk of 4.60 MiB bytes), current RSS: 3.29 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 112.946
+    },
+    {
+     "stream": 3,
+     "seq": 1,
+     "query": "q08",
+     "variant": "tuned",
+     "start_s": 0.149,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.01 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 18.698
+    },
+    {
+     "stream": 3,
+     "seq": 2,
+     "query": "q05",
+     "variant": "tuned",
+     "start_s": 18.847,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.02 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 82.943
+    },
+    {
+     "stream": 3,
+     "seq": 3,
+     "query": "q04",
+     "variant": "original",
+     "start_s": 101.789,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 4.40 MiB bytes), current RSS: 3.28 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 29.023
+    },
+    {
+     "stream": 3,
+     "seq": 4,
+     "query": "q06",
+     "variant": "original",
+     "start_s": 130.812,
+     "status": "ok",
+     "rows": 1,
+     "s": 12.672,
+     "slowdown": 18.801
+    },
+    {
+     "stream": 3,
+     "seq": 5,
+     "query": "q17",
+     "variant": "rewritten",
+     "start_s": 143.484,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 13.304
+    },
+    {
+     "stream": 3,
+     "seq": 6,
+     "query": "q07",
+     "variant": "original",
+     "start_s": 156.789,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 4.06 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 13.126
+    },
+    {
+     "stream": 3,
+     "seq": 7,
+     "query": "q01",
+     "variant": "original",
+     "start_s": 169.914,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 57.402
+    },
+    {
+     "stream": 3,
+     "seq": 8,
+     "query": "q18",
+     "variant": "original",
+     "start_s": 227.316,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 4.48 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 98.704
+    },
+    {
+     "stream": 3,
+     "seq": 9,
+     "query": "q22",
+     "variant": "original",
+     "start_s": 326.02,
+     "status": "ok",
+     "rows": 7,
+     "s": 16.936,
+     "slowdown": 18.469
+    },
+    {
+     "stream": 3,
+     "seq": 10,
+     "query": "q14",
+     "variant": "original",
+     "start_s": 342.956,
+     "status": "ok",
+     "rows": 1,
+     "s": 4.508,
+     "slowdown": 22.207
+    },
+    {
+     "stream": 3,
+     "seq": 11,
+     "query": "q09",
+     "variant": "tuned",
+     "start_s": 347.464,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.01 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 40.019
+    },
+    {
+     "stream": 3,
+     "seq": 12,
+     "query": "q10",
+     "variant": "original",
+     "start_s": 387.483,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.50 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 29.52
+    },
+    {
+     "stream": 3,
+     "seq": 13,
+     "query": "q15",
+     "variant": "original",
+     "start_s": 417.004,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 3.684
+    },
+    {
+     "stream": 3,
+     "seq": 14,
+     "query": "q11",
+     "variant": "original",
+     "start_s": 420.688,
+     "status": "ok",
+     "rows": 0,
+     "s": 24.867,
+     "slowdown": 22.084
+    },
+    {
+     "stream": 3,
+     "seq": 15,
+     "query": "q20",
+     "variant": "original",
+     "start_s": 445.555,
+     "status": "ok",
+     "rows": 1804,
+     "s": 10.942,
+     "slowdown": 12.694
+    },
+    {
+     "stream": 3,
+     "seq": 16,
+     "query": "q02",
+     "variant": "original",
+     "start_s": 456.497,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.04 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 20.603
+    },
+    {
+     "stream": 3,
+     "seq": 17,
+     "query": "q21",
+     "variant": "rewritten",
+     "start_s": 477.1,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.61 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 206.299
+    },
+    {
+     "stream": 3,
+     "seq": 18,
+     "query": "q19",
+     "variant": "original",
+     "start_s": 683.399,
+     "status": "ok",
+     "rows": 1,
+     "s": 32.697,
+     "slowdown": 7.607
+    },
+    {
+     "stream": 3,
+     "seq": 19,
+     "query": "q13",
+     "variant": "original",
+     "start_s": 716.096,
+     "status": "ok",
+     "rows": 46,
+     "s": 52.946,
+     "slowdown": 10.731
+    },
+    {
+     "stream": 3,
+     "seq": 20,
+     "query": "q16",
+     "variant": "original",
+     "start_s": 769.042,
+     "status": "ok",
+     "rows": 27840,
+     "s": 1.59,
+     "slowdown": 2.508
+    },
+    {
+     "stream": 3,
+     "seq": 21,
+     "query": "q12",
+     "variant": "original",
+     "start_s": 770.632,
+     "status": "ok",
+     "rows": 2,
+     "s": 8.807,
+     "slowdown": 3.395
+    },
+    {
+     "stream": 3,
+     "seq": 22,
+     "query": "q03",
+     "variant": "tuned",
+     "start_s": 779.441,
+     "status": "ok",
+     "rows": 10,
+     "s": 25.271,
+     "slowdown": 2.7
+    },
+    {
+     "stream": 4,
+     "seq": 1,
+     "query": "q05",
+     "variant": "tuned",
+     "start_s": 0.202,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.06 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 14.973
+    },
+    {
+     "stream": 4,
+     "seq": 2,
+     "query": "q21",
+     "variant": "rewritten",
+     "start_s": 15.175,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 114.075
+    },
+    {
+     "stream": 4,
+     "seq": 3,
+     "query": "q14",
+     "variant": "original",
+     "start_s": 129.251,
+     "status": "ok",
+     "rows": 1,
+     "s": 4.485,
+     "slowdown": 22.094
+    },
+    {
+     "stream": 4,
+     "seq": 4,
+     "query": "q19",
+     "variant": "original",
+     "start_s": 133.735,
+     "status": "ok",
+     "rows": 1,
+     "s": 58.812,
+     "slowdown": 13.684
+    },
+    {
+     "stream": 4,
+     "seq": 5,
+     "query": "q15",
+     "variant": "original",
+     "start_s": 192.547,
+     "status": "ok",
+     "rows": 1,
+     "s": 8.757,
+     "slowdown": 24.325
+    },
+    {
+     "stream": 4,
+     "seq": 6,
+     "query": "q17",
+     "variant": "rewritten",
+     "start_s": 201.305,
+     "status": "ok",
+     "rows": 1,
+     "s": 105.243,
+     "slowdown": 16.199
+    },
+    {
+     "stream": 4,
+     "seq": 7,
+     "query": "q12",
+     "variant": "original",
+     "start_s": 306.548,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.02 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 10.346
+    },
+    {
+     "stream": 4,
+     "seq": 8,
+     "query": "q06",
+     "variant": "original",
+     "start_s": 316.893,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.20 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 4.914
+    },
+    {
+     "stream": 4,
+     "seq": 9,
+     "query": "q04",
+     "variant": "original",
+     "start_s": 321.807,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.29 GiB (attempt to allocate chunk of 4.01 MiB bytes), current RSS: 3.29 GiB, maximum: 3.26 GiB. (MEMORY_LIMIT_EXCEEDED) (version 25.8.33.6 (official build)) (for url http:/",
+     "s": 0.112
+    },
+    {
+     "stream": 4,
+     "seq": 10,
+     "query": "q09",
+     "variant": "tuned",
+     "start_s": 321.919,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.29 GiB (attempt to allocate chunk of 4.04 MiB bytes), current RSS: 3.19 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: W",
+     "s": 4.334
+    },
+    {
+     "stream": 4,
+     "seq": 11,
+     "query": "q08",
+     "variant": "tuned",
+     "start_s": 326.253,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.29 GiB (attempt to allocate chunk of 4.02 MiB bytes), current RSS: 3.28 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 23.019
+    },
+    {
+     "stream": 4,
+     "seq": 12,
+     "query": "q16",
+     "variant": "original",
+     "start_s": 349.273,
+     "status": "ok",
+     "rows": 27840,
+     "s": 22.944,
+     "slowdown": 36.189
+    },
+    {
+     "stream": 4,
+     "seq": 13,
+     "query": "q11",
+     "variant": "original",
+     "start_s": 372.217,
+     "status": "ok",
+     "rows": 0,
+     "s": 26.633,
+     "slowdown": 23.653
+    },
+    {
+     "stream": 4,
+     "seq": 14,
+     "query": "q02",
+     "variant": "original",
+     "start_s": 398.85,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.25 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 16.644
+    },
+    {
+     "stream": 4,
+     "seq": 15,
+     "query": "q10",
+     "variant": "original",
+     "start_s": 415.494,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 4.07 MiB bytes), current RSS: 3.28 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 29.705
+    },
+    {
+     "stream": 4,
+     "seq": 16,
+     "query": "q18",
+     "variant": "original",
+     "start_s": 445.199,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.24 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 27.872
+    },
+    {
+     "stream": 4,
+     "seq": 17,
+     "query": "q01",
+     "variant": "original",
+     "start_s": 473.071,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 10.151
+    },
+    {
+     "stream": 4,
+     "seq": 18,
+     "query": "q13",
+     "variant": "original",
+     "start_s": 483.222,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.01 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 58.43
+    },
+    {
+     "stream": 4,
+     "seq": 19,
+     "query": "q07",
+     "variant": "original",
+     "start_s": 541.652,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 6.00 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 21.648
+    },
+    {
+     "stream": 4,
+     "seq": 20,
+     "query": "q22",
+     "variant": "original",
+     "start_s": 563.3,
+     "status": "ok",
+     "rows": 7,
+     "s": 33.204,
+     "slowdown": 36.209
+    },
+    {
+     "stream": 4,
+     "seq": 21,
+     "query": "q03",
+     "variant": "tuned",
+     "start_s": 596.504,
+     "status": "ok",
+     "rows": 10,
+     "s": 59.451,
+     "slowdown": 6.351
+    },
+    {
+     "stream": 4,
+     "seq": 22,
+     "query": "q20",
+     "variant": "original",
+     "start_s": 655.954,
+     "status": "ok",
+     "rows": 1804,
+     "s": 11.667,
+     "slowdown": 13.535
+    },
+    {
+     "stream": 5,
+     "seq": 1,
+     "query": "q21",
+     "variant": "rewritten",
+     "start_s": 0.168,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.28 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker: W",
+     "s": 7.403
+    },
+    {
+     "stream": 5,
+     "seq": 2,
+     "query": "q15",
+     "variant": "original",
+     "start_s": 7.571,
+     "status": "ok",
+     "rows": 1,
+     "s": 9.461,
+     "slowdown": 26.281
+    },
+    {
+     "stream": 5,
+     "seq": 3,
+     "query": "q04",
+     "variant": "original",
+     "start_s": 17.032,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.50 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 47.579
+    },
+    {
+     "stream": 5,
+     "seq": 4,
+     "query": "q06",
+     "variant": "original",
+     "start_s": 64.611,
+     "status": "ok",
+     "rows": 1,
+     "s": 12.527,
+     "slowdown": 18.586
+    },
+    {
+     "stream": 5,
+     "seq": 5,
+     "query": "q07",
+     "variant": "original",
+     "start_s": 77.14,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 6.00 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 34.169
+    },
+    {
+     "stream": 5,
+     "seq": 6,
+     "query": "q16",
+     "variant": "original",
+     "start_s": 111.309,
+     "status": "ok",
+     "rows": 27840,
+     "s": 12.367,
+     "slowdown": 19.506
+    },
+    {
+     "stream": 5,
+     "seq": 7,
+     "query": "q19",
+     "variant": "original",
+     "start_s": 123.676,
+     "status": "ok",
+     "rows": 1,
+     "s": 44.617,
+     "slowdown": 10.381
+    },
+    {
+     "stream": 5,
+     "seq": 8,
+     "query": "q18",
+     "variant": "original",
+     "start_s": 168.293,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.25 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 9.412
+    },
+    {
+     "stream": 5,
+     "seq": 9,
+     "query": "q14",
+     "variant": "original",
+     "start_s": 177.705,
+     "status": "ok",
+     "rows": 1,
+     "s": 5.099,
+     "slowdown": 25.118
+    },
+    {
+     "stream": 5,
+     "seq": 10,
+     "query": "q22",
+     "variant": "original",
+     "start_s": 182.804,
+     "status": "ok",
+     "rows": 7,
+     "s": 20.614,
+     "slowdown": 22.48
+    },
+    {
+     "stream": 5,
+     "seq": 11,
+     "query": "q11",
+     "variant": "original",
+     "start_s": 203.419,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 9.705
+    },
+    {
+     "stream": 5,
+     "seq": 12,
+     "query": "q13",
+     "variant": "original",
+     "start_s": 213.124,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.01 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 27.663
+    },
+    {
+     "stream": 5,
+     "seq": 13,
+     "query": "q03",
+     "variant": "tuned",
+     "start_s": 240.787,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 4.07 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 29.608
+    },
+    {
+     "stream": 5,
+     "seq": 14,
+     "query": "q01",
+     "variant": "original",
+     "start_s": 270.395,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.17 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 44.161
+    },
+    {
+     "stream": 5,
+     "seq": 15,
+     "query": "q02",
+     "variant": "original",
+     "start_s": 314.556,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.25 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 4.63
+    },
+    {
+     "stream": 5,
+     "seq": 16,
+     "query": "q05",
+     "variant": "tuned",
+     "start_s": 319.186,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.07 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 15.31
+    },
+    {
+     "stream": 5,
+     "seq": 17,
+     "query": "q08",
+     "variant": "tuned",
+     "start_s": 334.496,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.01 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. (MEMORY_LIMIT_EXCEEDED) (version 25.8.33.6 (official build)) (for url http:/",
+     "s": 0.1
+    },
+    {
+     "stream": 5,
+     "seq": 18,
+     "query": "q20",
+     "variant": "original",
+     "start_s": 334.596,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 6.375
+    },
+    {
+     "stream": 5,
+     "seq": 19,
+     "query": "q12",
+     "variant": "original",
+     "start_s": 340.97,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.02 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 10.619
+    },
+    {
+     "stream": 5,
+     "seq": 20,
+     "query": "q17",
+     "variant": "rewritten",
+     "start_s": 351.589,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.04 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 92.106
+    },
+    {
+     "stream": 5,
+     "seq": 21,
+     "query": "q10",
+     "variant": "original",
+     "start_s": 443.695,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.02 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 30.788
+    },
+    {
+     "stream": 5,
+     "seq": 22,
+     "query": "q09",
+     "variant": "tuned",
+     "start_s": 474.483,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.03 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 35.967
+    },
+    {
+     "stream": 6,
+     "seq": 1,
+     "query": "q10",
+     "variant": "original",
+     "start_s": 0.142,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.05 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 7.246
+    },
+    {
+     "stream": 6,
+     "seq": 2,
+     "query": "q03",
+     "variant": "tuned",
+     "start_s": 7.388,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 4.01 MiB bytes), current RSS: 3.28 GiB, maximum: 3.26 GiB. (MEMORY_LIMIT_EXCEEDED) (version 25.8.33.6 (official build)) (for url http:/",
+     "s": 0.068
+    },
+    {
+     "stream": 6,
+     "seq": 3,
+     "query": "q15",
+     "variant": "original",
+     "start_s": 7.456,
+     "status": "ok",
+     "rows": 1,
+     "s": 9.682,
+     "slowdown": 26.894
+    },
+    {
+     "stream": 6,
+     "seq": 4,
+     "query": "q13",
+     "variant": "original",
+     "start_s": 17.138,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.04 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 58.918
+    },
+    {
+     "stream": 6,
+     "seq": 5,
+     "query": "q06",
+     "variant": "original",
+     "start_s": 76.056,
+     "status": "ok",
+     "rows": 1,
+     "s": 21.408,
+     "slowdown": 31.763
+    },
+    {
+     "stream": 6,
+     "seq": 6,
+     "query": "q08",
+     "variant": "tuned",
+     "start_s": 97.465,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.05 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 42.722
+    },
+    {
+     "stream": 6,
+     "seq": 7,
+     "query": "q09",
+     "variant": "tuned",
+     "start_s": 140.187,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.38 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 32.513
+    },
+    {
+     "stream": 6,
+     "seq": 8,
+     "query": "q07",
+     "variant": "original",
+     "start_s": 172.7,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 4.50 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 9.997
+    },
+    {
+     "stream": 6,
+     "seq": 9,
+     "query": "q04",
+     "variant": "original",
+     "start_s": 182.697,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.03 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 19.246
+    },
+    {
+     "stream": 6,
+     "seq": 10,
+     "query": "q11",
+     "variant": "original",
+     "start_s": 201.943,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.25 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 11.066
+    },
+    {
+     "stream": 6,
+     "seq": 11,
+     "query": "q22",
+     "variant": "original",
+     "start_s": 213.009,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.01 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. (MEMORY_LIMIT_EXCEEDED) (version 25.8.33.6 (official build)) (for url http:/",
+     "s": 0.142
+    },
+    {
+     "stream": 6,
+     "seq": 12,
+     "query": "q18",
+     "variant": "original",
+     "start_s": 213.151,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.25 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 6.457
+    },
+    {
+     "stream": 6,
+     "seq": 13,
+     "query": "q12",
+     "variant": "original",
+     "start_s": 219.608,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 6.00 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 27.366
+    },
+    {
+     "stream": 6,
+     "seq": 14,
+     "query": "q01",
+     "variant": "original",
+     "start_s": 246.975,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 2.94 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 67.297
+    },
+    {
+     "stream": 6,
+     "seq": 15,
+     "query": "q05",
+     "variant": "tuned",
+     "start_s": 314.271,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.29 GiB (attempt to allocate chunk of 4.24 MiB bytes), current RSS: 3.19 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: (",
+     "s": 12.028
+    },
+    {
+     "stream": 6,
+     "seq": 16,
+     "query": "q16",
+     "variant": "original",
+     "start_s": 326.299,
+     "status": "ok",
+     "rows": 27840,
+     "s": 10.262,
+     "slowdown": 16.186
+    },
+    {
+     "stream": 6,
+     "seq": 17,
+     "query": "q02",
+     "variant": "original",
+     "start_s": 336.561,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 4.391
+    },
+    {
+     "stream": 6,
+     "seq": 18,
+     "query": "q14",
+     "variant": "original",
+     "start_s": 340.953,
+     "status": "ok",
+     "rows": 1,
+     "s": 5.05,
+     "slowdown": 24.877
+    },
+    {
+     "stream": 6,
+     "seq": 19,
+     "query": "q19",
+     "variant": "original",
+     "start_s": 346.003,
+     "status": "ok",
+     "rows": 1,
+     "s": 53.118,
+     "slowdown": 12.359
+    },
+    {
+     "stream": 6,
+     "seq": 20,
+     "query": "q20",
+     "variant": "original",
+     "start_s": 399.121,
+     "status": "ok",
+     "rows": 1804,
+     "s": 11.51,
+     "slowdown": 13.353
+    },
+    {
+     "stream": 6,
+     "seq": 21,
+     "query": "q17",
+     "variant": "rewritten",
+     "start_s": 410.631,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 25.688
+    },
+    {
+     "stream": 6,
+     "seq": 22,
+     "query": "q21",
+     "variant": "rewritten",
+     "start_s": 436.319,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.62 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 155.575
+    },
+    {
+     "stream": 7,
+     "seq": 1,
+     "query": "q18",
+     "variant": "original",
+     "start_s": 0.182,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.03 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 11.077
+    },
+    {
+     "stream": 7,
+     "seq": 2,
+     "query": "q08",
+     "variant": "tuned",
+     "start_s": 11.259,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 4.05 MiB bytes), current RSS: 3.28 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 15.744
+    },
+    {
+     "stream": 7,
+     "seq": 3,
+     "query": "q20",
+     "variant": "original",
+     "start_s": 27.003,
+     "status": "ok",
+     "rows": 1804,
+     "s": 30.485,
+     "slowdown": 35.365
+    },
+    {
+     "stream": 7,
+     "seq": 4,
+     "query": "q21",
+     "variant": "rewritten",
+     "start_s": 57.488,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 70.678
+    },
+    {
+     "stream": 7,
+     "seq": 5,
+     "query": "q02",
+     "variant": "original",
+     "start_s": 128.167,
+     "status": "ok",
+     "rows": 100,
+     "s": 32.145,
+     "slowdown": 24.151
+    },
+    {
+     "stream": 7,
+     "seq": 6,
+     "query": "q04",
+     "variant": "original",
+     "start_s": 160.311,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.33 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 19.48
+    },
+    {
+     "stream": 7,
+     "seq": 7,
+     "query": "q22",
+     "variant": "original",
+     "start_s": 179.791,
+     "status": "ok",
+     "rows": 7,
+     "s": 17.204,
+     "slowdown": 18.761
+    },
+    {
+     "stream": 7,
+     "seq": 8,
+     "query": "q17",
+     "variant": "rewritten",
+     "start_s": 196.995,
+     "status": "ok",
+     "rows": 1,
+     "s": 104.733,
+     "slowdown": 16.12
+    },
+    {
+     "stream": 7,
+     "seq": 9,
+     "query": "q01",
+     "variant": "original",
+     "start_s": 301.728,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.25 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 12.518
+    },
+    {
+     "stream": 7,
+     "seq": 10,
+     "query": "q11",
+     "variant": "original",
+     "start_s": 314.246,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.21 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 5.037
+    },
+    {
+     "stream": 7,
+     "seq": 11,
+     "query": "q09",
+     "variant": "tuned",
+     "start_s": 319.283,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.03 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 13.412
+    },
+    {
+     "stream": 7,
+     "seq": 12,
+     "query": "q19",
+     "variant": "original",
+     "start_s": 332.695,
+     "status": "ok",
+     "rows": 1,
+     "s": 45.644,
+     "slowdown": 10.62
+    },
+    {
+     "stream": 7,
+     "seq": 13,
+     "query": "q03",
+     "variant": "tuned",
+     "start_s": 378.339,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.02 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 31.715
+    },
+    {
+     "stream": 7,
+     "seq": 14,
+     "query": "q13",
+     "variant": "original",
+     "start_s": 410.054,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.10 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 20.733
+    },
+    {
+     "stream": 7,
+     "seq": 15,
+     "query": "q05",
+     "variant": "tuned",
+     "start_s": 430.787,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.04 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 17.219
+    },
+    {
+     "stream": 7,
+     "seq": 16,
+     "query": "q07",
+     "variant": "original",
+     "start_s": 448.006,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.50 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 13.7
+    },
+    {
+     "stream": 7,
+     "seq": 17,
+     "query": "q10",
+     "variant": "original",
+     "start_s": 461.707,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.22 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 15.646
+    },
+    {
+     "stream": 7,
+     "seq": 18,
+     "query": "q16",
+     "variant": "original",
+     "start_s": 477.353,
+     "status": "ok",
+     "rows": 27840,
+     "s": 20.384,
+     "slowdown": 32.151
+    },
+    {
+     "stream": 7,
+     "seq": 19,
+     "query": "q06",
+     "variant": "original",
+     "start_s": 497.738,
+     "status": "ok",
+     "rows": 1,
+     "s": 15.123,
+     "slowdown": 22.438
+    },
+    {
+     "stream": 7,
+     "seq": 20,
+     "query": "q14",
+     "variant": "original",
+     "start_s": 512.862,
+     "status": "ok",
+     "rows": 1,
+     "s": 4.284,
+     "slowdown": 21.103
+    },
+    {
+     "stream": 7,
+     "seq": 21,
+     "query": "q15",
+     "variant": "original",
+     "start_s": 517.146,
+     "status": "ok",
+     "rows": 1,
+     "s": 18.808,
+     "slowdown": 52.244
+    },
+    {
+     "stream": 7,
+     "seq": 22,
+     "query": "q12",
+     "variant": "original",
+     "start_s": 535.956,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.27 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 12.229
+    },
+    {
+     "stream": 8,
+     "seq": 1,
+     "query": "q19",
+     "variant": "original",
+     "start_s": 0.143,
+     "status": "ok",
+     "rows": 1,
+     "s": 62.767,
+     "slowdown": 14.604
+    },
+    {
+     "stream": 8,
+     "seq": 2,
+     "query": "q01",
+     "variant": "original",
+     "start_s": 62.91,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 94.378
+    },
+    {
+     "stream": 8,
+     "seq": 3,
+     "query": "q15",
+     "variant": "original",
+     "start_s": 157.288,
+     "status": "ok",
+     "rows": 1,
+     "s": 8.855,
+     "slowdown": 24.597
+    },
+    {
+     "stream": 8,
+     "seq": 4,
+     "query": "q17",
+     "variant": "rewritten",
+     "start_s": 166.144,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.25 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 11.716
+    },
+    {
+     "stream": 8,
+     "seq": 5,
+     "query": "q05",
+     "variant": "tuned",
+     "start_s": 177.86,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.00 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 35.714
+    },
+    {
+     "stream": 8,
+     "seq": 6,
+     "query": "q08",
+     "variant": "tuned",
+     "start_s": 213.574,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.00 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 51.212
+    },
+    {
+     "stream": 8,
+     "seq": 7,
+     "query": "q09",
+     "variant": "tuned",
+     "start_s": 264.786,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.08 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 15.825
+    },
+    {
+     "stream": 8,
+     "seq": 8,
+     "query": "q12",
+     "variant": "original",
+     "start_s": 280.611,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.02 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 14.378
+    },
+    {
+     "stream": 8,
+     "seq": 9,
+     "query": "q14",
+     "variant": "original",
+     "start_s": 294.989,
+     "status": "ok",
+     "rows": 1,
+     "s": 4.353,
+     "slowdown": 21.443
+    },
+    {
+     "stream": 8,
+     "seq": 10,
+     "query": "q07",
+     "variant": "original",
+     "start_s": 299.342,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 4.50 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 9.344
+    },
+    {
+     "stream": 8,
+     "seq": 11,
+     "query": "q04",
+     "variant": "original",
+     "start_s": 308.686,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.27 GiB (attempt to allocate chunk of 4.00 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 15.306
+    },
+    {
+     "stream": 8,
+     "seq": 12,
+     "query": "q03",
+     "variant": "tuned",
+     "start_s": 323.992,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.28 GiB (attempt to allocate chunk of 4.08 MiB bytes), current RSS: 3.27 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 18.113
+    },
+    {
+     "stream": 8,
+     "seq": 13,
+     "query": "q20",
+     "variant": "original",
+     "start_s": 342.106,
+     "status": "ok",
+     "rows": 1804,
+     "s": 10.699,
+     "slowdown": 12.412
+    },
+    {
+     "stream": 8,
+     "seq": 14,
+     "query": "q16",
+     "variant": "original",
+     "start_s": 352.804,
+     "status": "ok",
+     "rows": 27840,
+     "s": 15.13,
+     "slowdown": 23.864
+    },
+    {
+     "stream": 8,
+     "seq": 15,
+     "query": "q06",
+     "variant": "original",
+     "start_s": 367.934,
+     "status": "ok",
+     "rows": 1,
+     "s": 14.395,
+     "slowdown": 21.358
+    },
+    {
+     "stream": 8,
+     "seq": 16,
+     "query": "q22",
+     "variant": "original",
+     "start_s": 382.329,
+     "status": "ok",
+     "rows": 7,
+     "s": 25.825,
+     "slowdown": 28.162
+    },
+    {
+     "stream": 8,
+     "seq": 17,
+     "query": "q10",
+     "variant": "original",
+     "start_s": 408.154,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.01 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 29.924
+    },
+    {
+     "stream": 8,
+     "seq": 18,
+     "query": "q13",
+     "variant": "original",
+     "start_s": 438.078,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.10 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 17.209
+    },
+    {
+     "stream": 8,
+     "seq": 19,
+     "query": "q02",
+     "variant": "original",
+     "start_s": 455.287,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 0.00 B bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Memory overcommit has not freed enough memory: Whi",
+     "s": 15.002
+    },
+    {
+     "stream": 8,
+     "seq": 20,
+     "query": "q21",
+     "variant": "rewritten",
+     "start_s": 470.288,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 241, server response: Code: 241. DB::Exception: (total) memory limit exceeded: would use 3.26 GiB (attempt to allocate chunk of 4.03 MiB bytes), current RSS: 3.26 GiB, maximum: 3.26 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker:",
+     "s": 152.205
+    },
+    {
+     "stream": 8,
+     "seq": 21,
+     "query": "q18",
+     "variant": "original",
+     "start_s": 622.494,
+     "status": "ok",
+     "rows": 100,
+     "s": 119.296,
+     "slowdown": 10.356
+    },
+    {
+     "stream": 8,
+     "seq": 22,
+     "query": "q11",
+     "variant": "original",
+     "start_s": 741.792,
+     "status": "ok",
+     "rows": 0,
+     "s": 7.845,
+     "slowdown": 6.967
+    }
+   ],
+   "corrections": [
+    {
+     "set": 1,
+     "scenario": "insert_batch",
+     "units": 15000,
+     "start_s": 0.032,
+     "status": "ok",
+     "s": 1.311
+    },
+    {
+     "set": 1,
+     "scenario": "insert_small",
+     "units": 100,
+     "start_s": 1.343,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 64 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 4.474
+    },
+    {
+     "set": 1,
+     "scenario": "update_point",
+     "units": 1,
+     "start_s": 5.817,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 64 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 0.028
+    },
+    {
+     "set": 1,
+     "scenario": "update_100",
+     "units": 100,
+     "start_s": 5.845,
+     "status": "ok",
+     "s": 0.17
+    },
+    {
+     "set": 1,
+     "scenario": "update_1k",
+     "units": 1000,
+     "start_s": 6.014,
+     "status": "ok",
+     "s": 0.258
+    },
+    {
+     "set": 1,
+     "scenario": "update_10k",
+     "units": 10000,
+     "start_s": 6.272,
+     "status": "ok",
+     "s": 0.268
+    },
+    {
+     "set": 1,
+     "scenario": "delete_point",
+     "units": 1,
+     "start_s": 6.54,
+     "status": "ok",
+     "s": 0.068
+    },
+    {
+     "set": 1,
+     "scenario": "delete_100",
+     "units": 100,
+     "start_s": 6.609,
+     "status": "ok",
+     "s": 0.382
+    },
+    {
+     "set": 1,
+     "scenario": "delete_1k",
+     "units": 1000,
+     "start_s": 6.991,
+     "status": "ok",
+     "s": 0.318
+    },
+    {
+     "set": 1,
+     "scenario": "upsert_1k",
+     "units": 1000,
+     "start_s": 7.309,
+     "status": "ok",
+     "s": 0.149
+    },
+    {
+     "set": 2,
+     "scenario": "insert_batch",
+     "units": 15000,
+     "start_s": 7.458,
+     "status": "ok",
+     "s": 1.387
+    },
+    {
+     "set": 2,
+     "scenario": "insert_small",
+     "units": 100,
+     "start_s": 8.845,
+     "status": "ok",
+     "s": 7.207
+    },
+    {
+     "set": 2,
+     "scenario": "update_point",
+     "units": 1,
+     "start_s": 16.052,
+     "status": "ok",
+     "s": 0.042
+    },
+    {
+     "set": 2,
+     "scenario": "update_100",
+     "units": 100,
+     "start_s": 16.094,
+     "status": "ok",
+     "s": 0.097
+    },
+    {
+     "set": 2,
+     "scenario": "update_1k",
+     "units": 1000,
+     "start_s": 16.191,
+     "status": "ok",
+     "s": 0.136
+    },
+    {
+     "set": 2,
+     "scenario": "update_10k",
+     "units": 10000,
+     "start_s": 16.327,
+     "status": "ok",
+     "s": 0.219
+    },
+    {
+     "set": 2,
+     "scenario": "delete_point",
+     "units": 1,
+     "start_s": 16.546,
+     "status": "ok",
+     "s": 0.066
+    },
+    {
+     "set": 2,
+     "scenario": "delete_100",
+     "units": 100,
+     "start_s": 16.613,
+     "status": "ok",
+     "s": 0.208
+    },
+    {
+     "set": 2,
+     "scenario": "delete_1k",
+     "units": 1000,
+     "start_s": 16.821,
+     "status": "ok",
+     "s": 0.247
+    },
+    {
+     "set": 2,
+     "scenario": "upsert_1k",
+     "units": 1000,
+     "start_s": 17.068,
+     "status": "ok",
+     "s": 0.137
+    },
+    {
+     "set": 3,
+     "scenario": "insert_batch",
+     "units": 15000,
+     "start_s": 17.206,
+     "status": "ok",
+     "s": 1.356
+    },
+    {
+     "set": 3,
+     "scenario": "insert_small",
+     "units": 100,
+     "start_s": 18.562,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 64 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 0.085
+    },
+    {
+     "set": 3,
+     "scenario": "update_point",
+     "units": 1,
+     "start_s": 18.647,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 64 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 0.018
+    },
+    {
+     "set": 3,
+     "scenario": "update_100",
+     "units": 100,
+     "start_s": 18.665,
+     "status": "ok",
+     "s": 0.15
+    },
+    {
+     "set": 3,
+     "scenario": "update_1k",
+     "units": 1000,
+     "start_s": 18.815,
+     "status": "ok",
+     "s": 0.102
+    },
+    {
+     "set": 3,
+     "scenario": "update_10k",
+     "units": 10000,
+     "start_s": 18.916,
+     "status": "ok",
+     "s": 0.085
+    },
+    {
+     "set": 3,
+     "scenario": "delete_point",
+     "units": 1,
+     "start_s": 19.002,
+     "status": "ok",
+     "s": 0.049
+    },
+    {
+     "set": 3,
+     "scenario": "delete_100",
+     "units": 100,
+     "start_s": 19.051,
+     "status": "ok",
+     "s": 0.173
+    },
+    {
+     "set": 3,
+     "scenario": "delete_1k",
+     "units": 1000,
+     "start_s": 19.224,
+     "status": "ok",
+     "s": 0.224
+    },
+    {
+     "set": 3,
+     "scenario": "upsert_1k",
+     "units": 1000,
+     "start_s": 19.448,
+     "status": "ok",
+     "s": 0.157
+    },
+    {
+     "set": 4,
+     "scenario": "insert_batch",
+     "units": 15000,
+     "start_s": 19.605,
+     "status": "ok",
+     "s": 0.826
+    },
+    {
+     "set": 4,
+     "scenario": "insert_small",
+     "units": 100,
+     "start_s": 20.431,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 64 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 2.207
+    },
+    {
+     "set": 4,
+     "scenario": "update_point",
+     "units": 1,
+     "start_s": 22.638,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 64 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 0.016
+    },
+    {
+     "set": 4,
+     "scenario": "update_100",
+     "units": 100,
+     "start_s": 22.654,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 832 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 0.044
+    },
+    {
+     "set": 4,
+     "scenario": "update_1k",
+     "units": 1000,
+     "start_s": 22.699,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 8000 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123",
+     "s": 0.024
+    },
+    {
+     "set": 4,
+     "scenario": "update_10k",
+     "units": 10000,
+     "start_s": 22.722,
+     "status": "ok",
+     "s": 0.374
+    },
+    {
+     "set": 4,
+     "scenario": "delete_point",
+     "units": 1,
+     "start_s": 23.097,
+     "status": "ok",
+     "s": 0.067
+    },
+    {
+     "set": 4,
+     "scenario": "delete_100",
+     "units": 100,
+     "start_s": 23.164,
+     "status": "ok",
+     "s": 0.335
+    },
+    {
+     "set": 4,
+     "scenario": "delete_1k",
+     "units": 1000,
+     "start_s": 23.498,
+     "status": "ok",
+     "s": 0.211
+    },
+    {
+     "set": 4,
+     "scenario": "upsert_1k",
+     "units": 1000,
+     "start_s": 23.709,
+     "status": "ok",
+     "s": 0.184
+    },
+    {
+     "set": 5,
+     "scenario": "insert_batch",
+     "units": 15000,
+     "start_s": 23.893,
+     "status": "ok",
+     "s": 1.358
+    },
+    {
+     "set": 5,
+     "scenario": "insert_small",
+     "units": 100,
+     "start_s": 25.25,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 64 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 0.907
+    },
+    {
+     "set": 5,
+     "scenario": "update_point",
+     "units": 1,
+     "start_s": 26.157,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 64 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 0.008
+    },
+    {
+     "set": 5,
+     "scenario": "update_100",
+     "units": 100,
+     "start_s": 26.165,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 832 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 0.007
+    },
+    {
+     "set": 5,
+     "scenario": "update_1k",
+     "units": 1000,
+     "start_s": 26.173,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 8000 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123",
+     "s": 0.008
+    },
+    {
+     "set": 5,
+     "scenario": "update_10k",
+     "units": 10000,
+     "start_s": 26.181,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 80000 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:812",
+     "s": 0.08
+    },
+    {
+     "set": 5,
+     "scenario": "delete_point",
+     "units": 1,
+     "start_s": 26.261,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 64 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 0.012
+    },
+    {
+     "set": 5,
+     "scenario": "delete_100",
+     "units": 100,
+     "start_s": 26.273,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 3456 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123",
+     "s": 0.007
+    },
+    {
+     "set": 5,
+     "scenario": "delete_1k",
+     "units": 1000,
+     "start_s": 26.279,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 31744 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:812",
+     "s": 0.015
+    },
+    {
+     "set": 5,
+     "scenario": "upsert_1k",
+     "units": 1000,
+     "start_s": 26.295,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 8000 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123",
+     "s": 0.012
+    },
+    {
+     "set": 6,
+     "scenario": "insert_batch",
+     "units": 15000,
+     "start_s": 26.307,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 120000 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:81",
+     "s": 0.047
+    },
+    {
+     "set": 6,
+     "scenario": "insert_small",
+     "units": 100,
+     "start_s": 26.354,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 64 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 0.017
+    },
+    {
+     "set": 6,
+     "scenario": "update_point",
+     "units": 1,
+     "start_s": 26.371,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 64 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 0.024
+    },
+    {
+     "set": 6,
+     "scenario": "update_100",
+     "units": 100,
+     "start_s": 26.395,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 832 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 0.07
+    },
+    {
+     "set": 6,
+     "scenario": "update_1k",
+     "units": 1000,
+     "start_s": 26.464,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 8000 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123",
+     "s": 0.012
+    },
+    {
+     "set": 6,
+     "scenario": "update_10k",
+     "units": 10000,
+     "start_s": 26.477,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 80000 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:812",
+     "s": 0.034
+    },
+    {
+     "set": 6,
+     "scenario": "delete_point",
+     "units": 1,
+     "start_s": 26.511,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 64 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123)",
+     "s": 0.006
+    },
+    {
+     "set": 6,
+     "scenario": "delete_100",
+     "units": 100,
+     "start_s": 26.516,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 3072 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123",
+     "s": 0.004
+    },
+    {
+     "set": 6,
+     "scenario": "delete_1k",
+     "units": 1000,
+     "start_s": 26.521,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 32128 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:812",
+     "s": 0.004
+    },
+    {
+     "set": 6,
+     "scenario": "upsert_1k",
+     "units": 1000,
+     "start_s": 26.525,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 8000 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:8123",
+     "s": 0.009
+    },
+    {
+     "set": 7,
+     "scenario": "insert_batch",
+     "units": 15000,
+     "start_s": 26.534,
+     "status": "memory_limit",
+     "error": "Received ClickHouse exception, code: 33, server response: Code: 33. DB::Exception: Error while reading batch of Arrow data: Out of memory: allocation of size 120000 failed: While executing ArrowBlockInputFormat. (CANNOT_READ_ALL_DATA) (version 25.8.33.6 (official build)) (for url http://localhost:81",
+     "s": 0.28
+    },
+    {
+     "set": 7,
+     "scenario": "insert_small",
+     "units": 100,
+     "start_s": 26.814,
+     "status": "ok",
+     "s": 19.304
+    },
+    {
+     "set": 7,
+     "scenario": "update_point",
+     "units": 1,
+     "start_s": 46.118,
+     "status": "ok",
+     "s": 0.028
+    },
+    {
+     "set": 7,
+     "scenario": "update_100",
+     "units": 100,
+     "start_s": 46.146,
+     "status": "ok",
+     "s": 0.461
+    },
+    {
+     "set": 7,
+     "scenario": "update_1k",
+     "units": 1000,
+     "start_s": 46.607,
+     "status": "ok",
+     "s": 0.446
+    },
+    {
+     "set": 7,
+     "scenario": "update_10k",
+     "units": 10000,
+     "start_s": 47.053,
+     "status": "ok",
+     "s": 0.913
+    },
+    {
+     "set": 7,
+     "scenario": "delete_point",
+     "units": 1,
+     "start_s": 47.966,
+     "status": "ok",
+     "s": 0.186
+    },
+    {
+     "set": 7,
+     "scenario": "delete_100",
+     "units": 100,
+     "start_s": 48.152,
+     "status": "ok",
+     "s": 0.503
+    },
+    {
+     "set": 7,
+     "scenario": "delete_1k",
+     "units": 1000,
+     "start_s": 48.655,
+     "status": "ok",
+     "s": 0.314
+    },
+    {
+     "set": 7,
+     "scenario": "upsert_1k",
+     "units": 1000,
+     "start_s": 48.969,
+     "status": "ok",
+     "s": 0.577
+    },
+    {
+     "set": 8,
+     "scenario": "insert_batch",
+     "units": 15000,
+     "start_s": 49.547,
+     "status": "ok",
+     "s": 2.667
+    },
+    {
+     "set": 8,
+     "scenario": "insert_small",
+     "units": 100,
+     "start_s": 52.214,
+     "status": "ok",
+     "s": 8.779
+    },
+    {
+     "set": 8,
+     "scenario": "update_point",
+     "units": 1,
+     "start_s": 60.993,
+     "status": "ok",
+     "s": 0.019
+    },
+    {
+     "set": 8,
+     "scenario": "update_100",
+     "units": 100,
+     "start_s": 61.012,
+     "status": "ok",
+     "s": 0.122
+    },
+    {
+     "set": 8,
+     "scenario": "update_1k",
+     "units": 1000,
+     "start_s": 61.134,
+     "status": "ok",
+     "s": 0.097
+    },
+    {
+     "set": 8,
+     "scenario": "update_10k",
+     "units": 10000,
+     "start_s": 61.231,
+     "status": "ok",
+     "s": 0.165
+    },
+    {
+     "set": 8,
+     "scenario": "delete_point",
+     "units": 1,
+     "start_s": 61.396,
+     "status": "ok",
+     "s": 0.046
+    },
+    {
+     "set": 8,
+     "scenario": "delete_100",
+     "units": 100,
+     "start_s": 61.442,
+     "status": "ok",
+     "s": 0.203
+    },
+    {
+     "set": 8,
+     "scenario": "delete_1k",
+     "units": 1000,
+     "start_s": 61.645,
+     "status": "ok",
+     "s": 0.348
+    },
+    {
+     "set": 8,
+     "scenario": "upsert_1k",
+     "units": 1000,
+     "start_s": 61.993,
+     "status": "ok",
+     "s": 0.111
+    }
+   ],
+   "summary": {
+    "queries": 176,
+    "ok": 68,
+    "failed": 108,
+    "queries_per_hour": 273.7,
+    "slowdown_geomean": 16.61,
+    "slowdown_p95": 36.2,
+    "corrections_s": 62.1,
+    "corrections_done_s": 62.1,
+    "corrections_failed": 28,
+    "failures": [
+     "q01 memory_limit",
+     "q02 memory_limit",
+     "q03 memory_limit",
+     "q04 memory_limit",
+     "q05 memory_limit",
+     "q06 memory_limit",
+     "q07 memory_limit",
+     "q08 memory_limit",
+     "q09 memory_limit",
+     "q10 memory_limit",
+     "q11 memory_limit",
+     "q12 memory_limit",
+     "q13 memory_limit",
+     "q15 memory_limit",
+     "q17 memory_limit",
+     "q18 memory_limit",
+     "q20 memory_limit",
+     "q21 memory_limit",
+     "q22 memory_limit"
+    ]
+   }
+  }
+ ]
+}
