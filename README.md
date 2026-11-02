@@ -24,10 +24,11 @@ accept it. The planned deliverables are:
 3. **A risk assessment**: what breaks or gets harder after a migration.
 4. **A migration plan** with rollback procedures.
 
-This README covers the parts done so far: the setup, data loading, query benchmarks at
-three scale factors, the ClickHouse join tuning needed to complete them at SF 10, the write
-workload (sections 6–8), concurrency (section 9), the TCO comparison (section 10) and the risk
-assessment (section 11). The migration plan comes next.
+This README covers the setup, data loading, query benchmarks at three scale factors, the
+ClickHouse join tuning needed to complete them at SF 10, the write workload (sections 6–8),
+concurrency (section 9), the TCO comparison (section 10) and the risk assessment (section 11).
+**The migration is not recommended** (section 12), so the project ends there, without a
+migration plan.
 
 ### Synthetic data: TPC-H
 
@@ -1449,3 +1450,81 @@ Postgres, since not migrating has risks too.
   and a parallel run that reconciles every report against Postgres.
 - **Postgres's risks are mostly fixable in place** (partitioned restatements, more cache, plan
   checks) at a fraction of the migration cost. That option should be priced before deciding.
+
+## 12. Conclusion: the migration is not recommended
+
+The vendor claimed that moving the regulatory-reporting warehouse to a columnar engine would
+make it **10x faster at 60% lower cost**. The benchmark supports neither claim for this
+workload as a whole, and the migration would add risks that a regulatory system can't accept
+without major redesign. A migration plan (deliverable 4) is therefore not written.
+
+### Why
+
+1. **The cost claim fails.** Against self-managed Postgres, ClickHouse costs **113% more over
+   3 years** ($742k against $348k), and more in every sensitivity case (+64% to +187%). The
+   migration alone (~$350k) costs as much as 3 years of running Postgres. A 60% saving would
+   need the current warehouse to carry about $400k–$700k a year in licences that a move would
+   remove (section 10).
+2. **The speed claim holds only one report at a time.** With the ReplacingMergeTree design
+   that corrections require, ClickHouse is **8.6–10.9x** faster on single reports (warm;
+   section 8). With 2 or more reports at once on equal hardware, it completes **less of the
+   workload than Postgres** (62% → 9% against 86–100%), because concurrent queries exhaust its
+   memory (section 9). Giving it that memory is what removes the cost saving.
+3. **The highest risks are silent errors in financial figures** (section 11):
+   - corrections rejected under load, which go missing from the next report unless every
+     writer retries them;
+   - decimal values truncated with no error (Q8's market share, and a first restatement
+     script that left about 200,000 of 1.8 million tax changes unapplied, section 7);
+   - corrections that span two tables, readable half-applied, because there are no
+     multi-statement transactions.
+
+   Each can be mitigated, but only with a new correction pipeline, admission control, a
+   review of every report's arithmetic and a reconciled parallel run.
+4. **The scaling model doesn't fit the workload.** The regulatory batch is a peak of 6–8 hours,
+   with little load the rest of the day. Self-managed ClickHouse runs on fixed-size nodes:
+   - it doesn't autoscale, so it is sized and paid for at peak memory around the clock;
+   - scaling out means sharding with `Distributed` tables, which is manual to resize, and
+     distributed joins need the joined tables co-located or sent to every node, which would
+     make the heavy joins that already fail harder (sections 4, 5).
+
+   Postgres has the same limit, so this isn't an argument for staying on it forever. It means
+   that a migration, if one is made later, should be to compute that scales with the workload,
+   which this project didn't evaluate.
+5. **Postgres's problems can be fixed in place**, at a fraction of the migration cost
+   (section 11):
+   - it is I/O-bound (at most 1.1 of 3 cores used), so more RAM for cache and faster storage
+     help it most;
+   - bulk restatements that time out can run one year at a time on a table partitioned by year;
+   - the Q13 timeouts under load need a plan check.
+
+### What would change the decision
+
+The case for ClickHouse should be reopened only if all of these hold:
+- the current warehouse's licence and support cost is in the $400k–$700k a year range;
+- reports can run through a queue, 1–2 at a time, which keeps ClickHouse's memory, and its
+  cost, low;
+- a proof of concept at production scale confirms the memory sizing, since everything above
+  SF 10 is extrapolated;
+- the team accepts the correction design for good: ReplacingMergeTree, `final = 1` on every
+  read, no corrections to sort-key columns, and retries on every writer.
+
+### Recommended next steps
+
+1. **Improve Postgres in place:** price and test a node with more memory, a `lineitem` and
+   `orders` partitioned by year with year-by-year restatements, and the Q13 plan. Measure
+   whether they bring the reporting window down far enough.
+2. **Check the current licence cost**, the largest unknown in the TCO.
+3. **If the window still doesn't fit, evaluate an engine whose compute scales with the
+   workload,** with this project's method: the same queries, corrections, concurrency levels
+   and TCO model.
+
+### Limitations
+
+- Everything ran on one laptop with 3 CPUs and 4 GB per engine, at up to 10 GB of data.
+  Production figures (200 GB) are extrapolated from the SF 1 → 3 → 10 trend. The ratios and
+  failure modes are the solid result, not the absolute times or costs.
+- TPC-H stands in for the company's reports, and the correction workload is generated
+  (section 6).
+- The TCO uses assumptions that weren't measured, such as the number of reports and the
+  migration effort per report. All of them are listed in
+  [tco/assumptions.toml](tco/assumptions.toml) and varied in section 10.
