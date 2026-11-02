@@ -1181,8 +1181,6 @@ The details of each step:
       44 ÷ 4,766 × 3600 = 33.2 queries per hour;
   - the corrections' times and failures;
   - the container's CPU, peak memory and disk reads over the level (cgroup, as in section 4).
-- **TPC-H throughput figure** (S × 22 × 3600 ÷ wall time × SF): TPC-H defines it only when
-  every query completes, so it exists for one level only: Postgres with 2 streams, 332.4.
 - **Postgres with 8 streams was not run.** The run was interrupted after about 2.5 hours, when
   the runner process died, and was not repeated. At 4 streams Postgres was still far below
   ClickHouse's throughput and already timing out, so 8 streams would not change the
