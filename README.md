@@ -1105,8 +1105,34 @@ python scripts/run_concurrency.py --engine clickhouse --sf 1 --levels 1,2 --quer
 
 ### Setup
 
-[scripts/run_concurrency.py](scripts/run_concurrency.py) runs one level per number of query
-streams S (1, 2, 4, 8):
+A **stream** is one analyst running the full set of 22 reports, one after another. The number
+of streams S is the number of analysts working at the same time.
+[scripts/run_concurrency.py](scripts/run_concurrency.py) runs one level per value of S
+(1, 2, 4, 8). The levels run one after another, never at the same time, and each one runs as
+follows:
+
+1. **Prepare:** rebuild fresh copies of `orders` and `lineitem`, so every level starts from
+   the same data, then restart the container with an empty cache (cold start).
+2. **Start all streams at once and start the clock:**
+   - **S query streams**, each running all 22 TPC-H queries in sequence. Every stream runs the
+     same 22 queries, but in a different order, so the streams don't all hit the same heavy
+     query at the same moment.
+   - **1 corrections stream**, applying S correction sets in sequence (inserts, updates,
+     deletes, upserts): late-arriving corrections while the reports run.
+3. **Stop the clock** when every stream has finished. The elapsed time is the level's
+   **wall time**.
+
+| Level (S) | Query streams in parallel | Queries in total | Correction sets |
+|--:|--:|--:|--:|
+| 1 | 1 | 22 | 1 |
+| 2 | 2 | 44 | 2 |
+| 4 | 4 | 88 | 4 |
+| 8 | 8 | 176 | 8 |
+
+For example, Postgres with 2 streams took 4,766 s: two analysts each ran all 22 reports side
+by side, corrections ran alongside them, and the last report finished 4,766 s after the start.
+
+The details of each step:
 
 - **Data:** each level starts from fresh copies of `orders` and `lineitem`, built as in the
   write benchmark (section 7), so every level sees the same data.
@@ -1120,9 +1146,23 @@ streams S (1, 2, 4, 8):
   the fastest one that completed in the single-user SF 10 run. On ClickHouse that is the
   ReplacingMergeTree run with `final = 1` (section 8), including the tuned Q3, Q5, Q8 and Q9.
 - **Corrections stream:** one more stream applies S correction sets back to back, as TPC-H
-  applies S refresh pairs. A set is one run of every write scenario from section 7 except the
-  restatement, which is a scheduled bulk job and a Postgres timeout at SF 10. Each engine uses
-  its production method: Postgres transactions, ClickHouse ReplacingMergeTree inserts.
+  applies S refresh pairs.
+  - **Which corrections:** the write scenarios from section 7, with the same pre-generated rows
+    and the same code: `insert_batch`, `insert_small`, `update_point`, `update_100`,
+    `update_1k`, `update_10k`, `delete_point`, `delete_100`, `delete_1k`, `upsert_1k`. The
+    restatement is left out: it is a scheduled bulk job, not a late correction, and a Postgres
+    timeout at SF 10.
+  - **How many times:** a set is one run of each of the 10 scenarios, so each scenario runs
+    once at level 1, twice at level 2, 4 times at level 4 and 8 times at level 8 (10, 20, 40
+    and 80 write operations).
+  - **Each repeat uses different rows:** set *k* uses run *k* of each scenario from section 7.
+    For example, at level 4 `update_1k` runs 4 times, on 4 different batches of 1,000 line
+    items. No row is corrected twice.
+  - **Set by set, one at a time:** the stream applies the 10 scenarios in the order above, then
+    starts the next set. Only one correction runs at a time, alongside the query streams.
+  - **Method:** each engine uses its production method: Postgres transactions, ClickHouse
+    ReplacingMergeTree inserts (the lightweight `UPDATE`/`DELETE` method from section 7 is not
+    used here).
 - **Limits:** the same as every other section: 3 CPUs and 4 GB per container, a 30-minute
   timeout, and on ClickHouse `max_memory_usage` = 3 GB per query and
   `max_server_memory_usage` = 3.5 GB for the server (section 2). Timeouts and memory-limit
@@ -1130,7 +1170,15 @@ streams S (1, 2, 4, 8):
 - **Metrics:**
   - each query's time and status;
   - its **slowdown**: time ÷ the single-user warm median;
-  - **queries per hour**, counting completed queries only;
+  - **queries per hour**: the level's throughput, i.e. the rate of successful work. It is the
+    number of completed queries ÷ the level's wall time × 3600.
+    - *Completed queries* are those from the query streams only. Failed and timed-out queries
+      are left out, and so are corrections, which are reported separately.
+    - *Wall time* (step 3 above) ends when the last query finishes. At every level the
+      corrections finished earlier, within the first 3–62 s on ClickHouse and 94–409 s on
+      Postgres.
+    - Example: Postgres with 2 streams completed 44 queries in 4,766 s, so
+      44 ÷ 4,766 × 3600 = 33.2 queries per hour;
   - the corrections' times and failures;
   - the container's CPU, peak memory and disk reads over the level (cgroup, as in section 4).
 - **TPC-H throughput figure** (S × 22 × 3600 ÷ wall time × SF): TPC-H defines it only when
