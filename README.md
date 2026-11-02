@@ -1191,21 +1191,31 @@ The details of each step:
 
 ### Results (SF 10)
 
-**Work completed** weighs each completed query by its single-user warm time. It is the share
-of the reporting workload that actually produced a result. Queries per hour alone flatters
-ClickHouse at high concurrency, because the queries that still complete there are mostly the
-light ones.
+**How to read this table.** Each row is one level: S streams running at the same time, plus
+the corrections stream.
+- **Queries/h** is the throughput: completed queries per hour. Read it down each engine: if it
+  rises, adding analysts gets more reports done; if it stays flat, the server is at its limit.
+  Every query counts as 1, whether it is a light or a heavy one.
+- **Work completed** weighs each completed query by its single-user warm time. It is the share
+  of the reporting workload that actually produced a result. Read it together with queries/h:
+  queries/h alone flatters ClickHouse at high concurrency, because the queries that still
+  complete there are mostly the light ones.
+- **Slowdown** is a query's time here ÷ its single-user warm time: 1x is as fast as alone, 3x is
+  3 times slower. The **geomean** is the typical slowdown across the completed queries (a
+  geometric mean, so a few extreme ratios don't dominate). The **p95** is the bad end: 95% of
+  the completed queries slowed down by at most this much. Failed queries are not included, so
+  on ClickHouse from 2 streams on they describe the queries that survived.
 
-| Streams | Engine | Wall time | Completed | Failed | Queries/h | Work completed | Slowdown, geomean (p95) | Avg cores | Disk read |
-|--:|---|--:|--:|---|--:|--:|--:|--:|--:|
-| 1 | Postgres | 4,133 s | 21 / 22 | 1 timeout | 18.3 | 98% | 2.29x (21.1x) | 0.48 | 254 GB |
-| 1 | ClickHouse | 223 s | 21 / 22 | 1 memory | 338.9 | 80% | 1.45x (2.8x) | 2.53 | 9.8 GB |
-| 2 | Postgres | 4,766 s | 44 / 44 | — | 33.2 | 100% | 3.51x (79.0x) | 0.67 | 553 GB |
-| 2 | ClickHouse | 505 s | 36 / 44 | 8 memory | 256.7 | 62% | 3.32x (6.5x) | 2.41 | 22.6 GB |
-| 4 | Postgres | 6,796 s | 82 / 88 | 6 timeouts | 43.4 | 86% | 4.02x (82.5x) | 1.10 | 929 GB |
-| 4 | ClickHouse | 816 s | 61 / 88 | 26 memory, 1 timeout | 269.0 | 34% | 7.74x (20.6x) | 2.56 | 39.4 GB |
-| 8 | Postgres | not run | | | | | | | |
-| 8 | ClickHouse | 894 s | 68 / 176 | 108 memory | 273.7 | **9%** | 16.61x (36.2x) | 2.78 | 37.9 GB |
+| Streams | Engine | Wall time | Completed | Failed | Queries/h | Work completed | Slowdown, geomean | Slowdown, p95 | Avg cores | Disk read |
+|--:|---|--:|--:|---|--:|--:|--:|--:|--:|--:|
+| 1 | Postgres | 4,133 s | 21 / 22 | 1 timeout | 18.3 | 98% | 2.29x | 21.1x | 0.48 | 254 GB |
+| 1 | ClickHouse | 223 s | 21 / 22 | 1 memory | 338.9 | 80% | 1.45x | 2.8x | 2.53 | 9.8 GB |
+| 2 | Postgres | 4,766 s | 44 / 44 | — | 33.2 | 100% | 3.51x | 79.0x | 0.67 | 553 GB |
+| 2 | ClickHouse | 505 s | 36 / 44 | 8 memory | 256.7 | 62% | 3.32x | 6.5x | 2.41 | 22.6 GB |
+| 4 | Postgres | 6,796 s | 82 / 88 | 6 timeouts | 43.4 | 86% | 4.02x | 82.5x | 1.10 | 929 GB |
+| 4 | ClickHouse | 816 s | 61 / 88 | 26 memory, 1 timeout | 269.0 | 34% | 7.74x | 20.6x | 2.56 | 39.4 GB |
+| 8 | Postgres | not run | | | | | | | | |
+| 8 | ClickHouse | 894 s | 68 / 176 | 108 memory | 273.7 | **9%** | 16.61x | 36.2x | 2.78 | 37.9 GB |
 
 ClickHouse's container peaked at its 4,096 MB limit at every level, and Postgres's at 4 streams.
 Postgres's peak working memory stayed under 1 GB. The rest was page cache.
