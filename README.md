@@ -26,7 +26,8 @@ accept it. The planned deliverables are:
 
 This README covers the parts done so far: the setup, data loading, query benchmarks at
 three scale factors, the ClickHouse join tuning needed to complete them at SF 10, the write
-workload (sections 6–8) and concurrency (section 9). TCO, risk and the migration plan come next.
+workload (sections 6–8), concurrency (section 9), the TCO comparison (section 10) and the risk
+assessment (section 11). The migration plan comes next.
 
 ### Synthetic data: TPC-H
 
@@ -1308,3 +1309,143 @@ Postgres timeouts: Q13 in 5 of 7 runs (including the 1-stream run), Q9 and Q21 o
   missing from the next report unless the loader retries it. Postgres never rejected one.
 - **Postgres sizing is I/O and page cache.** More RAM for cache and faster storage would help
   it more than more cores, since it used at most 1.1 of its 3.
+
+## 10. TCO comparison
+
+[scripts/tco.py](scripts/tco.py) prices both options over **3 years**, self-managed on AWS
+(us-east-1, EC2 on-demand list prices), at production scale (SF 200, ~200 GB). Every price,
+rate and benchmark figure it uses is in [tco/assumptions.toml](tco/assumptions.toml), with its
+source and the date it was read. Assumptions that aren't measured or published are marked as
+such and varied in the sensitivity table.
+
+```bash
+python scripts/tco.py
+```
+
+### How each option is sized
+
+Both options run a primary and an HA replica of the same size, with gp3 volumes and snapshots.
+
+- **Postgres** (status quo) meets its 6–8 h window by definition, so its node only has to keep
+  the benchmark's resources per GB of data: memory × 20 (80 GB) and its peak cores under load
+  × 20 (22 vCPU). That's an **r7i.8xlarge** (32 vCPU, 256 GB). Storage is 20 × the SF 10 size,
+  plus the 37% growth measured after the write workload: 458 GB.
+- **ClickHouse** is sized by **memory**, because memory is what made it fail (section 9), while
+  CPU only set the speed. It needs 4 concurrent reports × a 60 GB per-query peak (3 GB at
+  SF 10, scaled with the data, the ratio that was tested), plus the server and inserts, ÷ the
+  90% of RAM the server may use: **278 GB**, so an **r7i.12xlarge** (48 vCPU, 384 GB). Its data
+  is 80 GB.
+- **Operations:** 0.5 FTE on both, at the BLS median salary for database administrators,
+  loaded by the BLS employer cost of benefits (wages are 70% of compensation): $75k per year.
+  There's no ClickHouse premium in the base case: ClickHouse Inc. posts the same pay band for
+  its ClickHouse and Postgres infrastructure engineers.
+- **Migration** (ClickHouse only, one-off), at the BLS median salary for database architects:
+  - 100 regulatory reports × 2 days to port, set `final = 1`, review decimal arithmetic and
+    validate against Postgres;
+  - plus 3 days for each report that needs a fix. In the benchmark that was 6 of 22 (27%):
+    the tuned Q3, Q5, Q8 and Q9, the rewritten Q21, and Q8's decimal precision. As a check, the
+    join tuning of 4 queries took about one working day in this project (git history), before
+    any production review or sign-off;
+  - 10 weeks for the correction pipeline: ReplacingMergeTree tables, versioned writes, retries,
+    admission control and `REPLACE PARTITION` restatements;
+  - a 3-month parallel run, with Postgres still in production and 0.5 FTE reconciling results.
+
+### Results (base case)
+
+| | Postgres | ClickHouse |
+|---|--:|--:|
+| Node (× 2: primary + replica) | r7i.8xlarge (32 vCPU, 256 GB) | r7i.12xlarge (48 vCPU, 384 GB) |
+| Compute per year | $37k | $56k |
+| Storage + snapshots per year | $4k | $1k |
+| Operations per year | $75k | $75k |
+| **Running cost per year** | **$116k** | **$131k** |
+| Migration: reports + pipeline (332 days) | — | $301k |
+| Migration: parallel run | — | $48k |
+| **3-year TCO** | **$348k** | **$742k** |
+
+**ClickHouse costs 113% more over 3 years, not 60% less.** Its infrastructure costs 37% more
+per year, and the migration alone costs as much as 3 years of running Postgres.
+
+### Sensitivity
+
+One assumption changed at a time. "Licence for a 60% saving" is how much the current
+warehouse would have to cost per year in licences and support, on top of the Postgres
+figures, for ClickHouse to cost 60% less over 3 years.
+
+| Case | ClickHouse node | Postgres, 3 y | ClickHouse, 3 y | ClickHouse vs Postgres | Infra per year | Licence for a 60% saving |
+|---|---|--:|--:|--:|--:|--:|
+| Base case | r7i.12xlarge | $348k | $742k | +113% | +37% | $502k/y |
+| 1 concurrent report (base 4) | r7i.4xlarge | $348k | $631k | +81% | -53% | $410k/y |
+| 2 concurrent reports | r7i.8xlarge | $348k | $686k | +97% | -8% | $456k/y |
+| 8 concurrent reports | r7i.24xlarge | $348k | $909k | +161% | +172% | $641k/y |
+| Per-query memory grows 25% as fast as the data (more spilling, untested) | r7i.4xlarge | $348k | $631k | +81% | -53% | $410k/y |
+| 3-year reserved instances, both engines | r7i.12xlarge | $287k | $646k | +125% | +25% | $442k/y |
+| Postgres needs r7i.16xlarge for I/O | r7i.12xlarge | $459k | $751k | +64% | -28% | $473k/y |
+| 50 reports to migrate (base 100) | r7i.12xlarge | $348k | $614k | +77% | +37% | $396k/y |
+| 200 reports to migrate | r7i.12xlarge | $348k | $997k | +187% | +37% | $715k/y |
+| ClickHouse operators cost 25% more (scarcity) | r7i.12xlarge | $348k | $798k | +129% | +37% | $549k/y |
+| ClickHouse needs 0.75 FTE to operate (base 0.5) | r7i.12xlarge | $348k | $854k | +146% | +37% | $596k/y |
+
+### Key findings (TCO)
+
+1. **At 200 GB, people cost more than machines.** Operations and migration are 65% of
+   Postgres's 3-year cost and 77% of ClickHouse's. Infrastructure differences of tens of thousands of dollars a
+   year can't pay back a migration of about $350k within 3 years.
+2. **ClickHouse's infrastructure is only cheaper at low concurrency.** With 1 report at a
+   time, or if per-query memory could be capped by spilling (untested), it needs a 128 GB node
+   and costs 53% less to run, close to the claimed 60%. At 4 concurrent reports, memory makes
+   it 37% more expensive, and at 8, 172% more.
+3. **"10x faster" and "60% cheaper" can't both come from the hardware.** A smaller ClickHouse
+   node is cheaper but has less memory, which is exactly what makes concurrent reports fail.
+4. **The 60% saving needs a licence to remove.** Against self-managed Postgres, no case in the
+   table comes close. It's only plausible if the current warehouse is a commercial product
+   costing about **$400k–$700k per year** in licences and support. That figure should be
+   checked against the company's actual contract before the claim is accepted.
+5. **The figures are estimates.** They extrapolate laptop measurements at SF 10 to SF 200,
+   assuming that 20 × the data with 20 × the resources behaves like the benchmark. That holds
+   best for ClickHouse's memory and least for Postgres's I/O, which is why the sensitivity
+   table includes a twice-as-large Postgres node.
+
+## 11. Risk assessment
+
+Each risk is rated by likelihood and impact for a regulatory-reporting system, with the
+section that found it. The first table covers migrating; the second covers staying on
+Postgres, since not migrating has risks too.
+
+### Risks of migrating to ClickHouse
+
+| # | Risk | Evidence | Likelihood | Impact | Mitigation |
+|--:|---|---|---|---|---|
+| 1 | **Reports and corrections fail on memory under concurrency.** Failed reports are missing from the window; rejected corrections are silently absent from the next report. | Work completed 80% → 9% at 1 → 8 streams; 32 of 120 corrections rejected at 4–8 streams (9) | High | High | Size memory for concurrency (section 10); admission control (`max_concurrent_queries`, workload scheduling); a separate memory budget for writes; retries on every writer |
+| 2 | **Heavy joins need per-report tuning, and it has to be redone as data grows.** No single server setting runs all reports. | Q3, Q5, Q8, Q9 out of memory at SF 10 with the default join; the fix makes them 1.1–1.8x slower at small scales (4, 5) | High | High | Inventory of heavy reports, per-query `join_algorithm`, regression tests at production volume before every growth step |
+| 3 | **Silent decimal precision loss in financial figures.** | Q8 division truncated to 4 digits; a Float64 literal truncated 200,000 restated tax rates with no error (4, 7) | High | High | Review all decimal arithmetic, use explicit `toDecimal`; automated reconciliation against Postgres in the parallel run |
+| 4 | **No multi-statement atomicity.** A two-table correction (lines and order total) can be read half-applied. | Each Postgres run is one transaction; on ClickHouse a delete-then-insert or two-table change is several statements (6, 7) | High | High | Single-table versioned inserts; `REPLACE PARTITION` for bulk changes (atomic); reconciliation checks before reports run |
+| 5 | **The correction design is a one-way constraint.** Lightweight `UPDATE`/`DELETE` cost grows with the table; ReplacingMergeTree needs `final = 1` permanently, keeps tombstones, and duplicates a row whose sort key changes. | Lightweight `delete_1k` 19 s and 53 s CPU per run at SF 10; tombstones survive `OPTIMIZE FINAL` (7, 8) | Certain | Medium | ReplacingMergeTree with `final = 1` in the readers' profile; forbid sort-key corrections (delete + insert instead) |
+| 6 | **The speedup is smaller than claimed in production conditions.** | Warm speedup 22.8x → 8.6x with the tuned joins and `FINAL`; at equal hardware, less work completed than Postgres from 2 streams on (4, 8, 9) | Certain | Medium | Restate the target as "about 9–11x, single-user, warm"; accept only after a production-scale proof of concept |
+| 7 | **Default memory accounting stops accepting writes.** | Memory-tracker drift rejected one-row inserts at 1.0–1.7 GB real use (7) | Medium | High | `memory_worker_correct_memory_tracker = 1`; alert on tracked vs real memory |
+| 8 | **Reports need rewriting, not just moving.** | Correlated Q21 fails under every join setting; its rewrite works (4) | Certain | Medium | Rewrite and re-validate every correlated report; budgeted in section 10 |
+| 9 | **The cost case doesn't hold.** | +113% over 3 years against self-managed Postgres (10) | High | High | Check the current licence cost; the saving needs about $400k–$700k a year of it |
+| 10 | **New skills for the team** (merges, parts, memory limits, settings profiles). | The tracker drift and join limits are settings an operations team finds only in production (5, 7) | Medium | Medium | Training before the parallel run; vendor support contract |
+
+### Risks of staying on Postgres
+
+| # | Risk | Evidence | Likelihood | Impact | Mitigation |
+|--:|---|---|---|---|---|
+| 1 | **Bulk restatements don't finish.** One year couldn't be restated in 30 minutes at SF 10, and the attempts left 2.7 GB of bloat. | 3 timeouts, 200 GB written and rolled back (7) | High | High | Restate in partitions (declarative partitioning by year) or in batches; schedule outside the window |
+| 2 | **The window grows with data and concurrency.** Postgres is I/O-bound and its fast lookups suffer most when reports run together. | ≤ 1.1 of 3 cores used; Q2, Q11, Q17, Q19 15–100x slower under load (9) | High | Medium | More RAM for cache and faster storage (not more cores); partitioning; fewer concurrent heavy reports |
+| 3 | **Unexplained timeouts.** | Q13 timed out in 5 of 7 concurrent runs but took 42 s alone; the Q4 rewrite is unstable (4, 9) | Medium | Medium | Check the plans (`EXPLAIN ANALYZE`) on production copies; pin statistics targets |
+| 4 | **Maintenance cost.** | VACUUM 466 s at SF 10; the indexes stay 64% larger after it (7) | Certain | Low | Autovacuum tuning; periodic `REINDEX CONCURRENTLY` |
+
+### Overall assessment
+
+- **The 10x claim is about right for single reports, and not for the system as a whole.**
+  ClickHouse is 8.6–10.9x faster on single reports (warm) in the design that corrections
+  require, but at equal hardware it delivers less of a concurrent workload than Postgres.
+- **The 60% cost claim isn't supported** against a self-managed Postgres baseline. It depends
+  on removing a licence the benchmark didn't price.
+- **The highest risks are the ones that produce wrong or missing numbers silently**: rejected
+  corrections (1), decimal truncation (3) and half-applied corrections (4). For a regulator,
+  these matter more than speed. All three can be mitigated, but only with deliberate design
+  and a parallel run that reconciles every report against Postgres.
+- **Postgres's risks are mostly fixable in place** (partitioned restatements, more cache, plan
+  checks) at a fraction of the migration cost. That option should be priced before deciding.

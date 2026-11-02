@@ -1,0 +1,99 @@
+# TCO assumptions for scripts/tco.py. Every price and rate has a source and the date it was
+# read; every benchmark figure points to the README section it comes from. Values marked
+# "assumption" are not measured or published: they are the model's choices, varied in the
+# sensitivity table.
+
+horizon_years = 3
+hours_per_year = 8760
+
+[production]
+scale_factor = 200        # ~200 GB (README section 1); 20x the largest benchmarked scale
+benchmark_sf = 10
+streams = 4               # assumption: concurrent regulatory reports during the batch window
+
+# ---------------------------------------------------------------------------------------
+# Measured at SF 10 on 3 CPUs / 4 GB per container (README sections 4, 7, 8, 9)
+# ---------------------------------------------------------------------------------------
+[benchmark]
+pg_disk_gb = 16.73                # data + indexes, section 4 (Data load)
+pg_write_growth = 0.37            # 14.3 -> 19.6 GB after the write workload, section 7
+pg_peak_cores = 1.1               # most cores Postgres used under load, section 9
+ch_disk_gb = 4.01                 # compressed, section 4
+ch_query_peak_gb = 3.0            # per-query peak of the heavy joins (limit 3 GB), sections 5 and 8
+ch_server_overhead_gb = 0.5       # server + correction inserts, sections 4 and 9
+reports_needing_fix = 6           # of 22 at SF 10: tuned Q3/Q5/Q8/Q9, rewritten Q21,
+reports_total = 22                #   Q8 decimal precision review (sections 4, 5)
+
+# ---------------------------------------------------------------------------------------
+# AWS, us-east-1, Linux, on-demand list prices
+# Source: instances.vantage.sh (AWS price list mirror), read 2026-11-02
+# ---------------------------------------------------------------------------------------
+[aws.instances]
+# name = [vCPU, memory GiB, on-demand $/h, 3-year reserved $/h, EBS throughput MB/s]
+"r7i.4xlarge"  = [16, 128, 1.0584, 0.480, 625]
+"r7i.8xlarge"  = [32, 256, 2.1168, 0.960, 1250]
+"r7i.12xlarge" = [48, 384, 3.1752, 1.440, 1875]
+"r7i.16xlarge" = [64, 512, 4.2336, 1.920, 2500]
+"r7i.24xlarge" = [96, 768, 6.3504, 2.880, 3750]
+
+# Source: aws.amazon.com/ebs/pricing, read 2026-11-02
+[aws.ebs]
+gp3_gb_month = 0.08
+gp3_iops_month = 0.005            # above 3,000 included
+gp3_mbps_month = 0.06             # above 125 MB/s included
+snapshot_gb_month = 0.05
+snapshot_retention_factor = 2.0   # assumption: snapshot storage = 2x the data (incrementals)
+
+# ---------------------------------------------------------------------------------------
+# Node sizing (both engines: one primary + one HA replica of the same size)
+# ---------------------------------------------------------------------------------------
+[sizing]
+nodes = 2
+storage_headroom = 1.4            # assumption: growth and free space on top of measured size
+# Postgres: the status quo meets its 6-8 h window by definition. Its node keeps at least the
+# benchmark's resources per GB of data x 20 for memory (80 GB) and the measured peak cores
+# x 20 (22): r7i.8xlarge, 32 vCPU / 256 GB. Its 1,250 MB/s EBS limit is below 20x the
+# laptop's disk rate; the 3.2x larger cache ratio is assumed to make up for it.
+pg_instance = "r7i.8xlarge"
+pg_iops = 12000
+pg_mbps = 1000
+# ClickHouse: memory = streams x per-query peak + overhead, scaled to production, divided by
+# the share of RAM the server may use. CPU only sets the speed (it was saturated at every
+# level), so the smallest node with enough memory is chosen.
+ch_query_memory_growth = 1.0      # 1.0 = per-query peak grows with the data (60 GB at SF 200),
+                                  #   the ratio tested; lower = more spilling, untested
+ch_ram_ratio = 0.9                # ClickHouse default max_server_memory_usage_to_ram_ratio
+ch_min_vcpu = 16
+ch_iops = 3000
+ch_mbps = 500
+
+# ---------------------------------------------------------------------------------------
+# Labour
+# Source: BLS Occupational Outlook Handbook, Database Administrators and Architects,
+#   median pay May 2025 (page modified 2026-08-27), read 2026-11-02
+# Source: BLS Employer Costs for Employee Compensation, June 2026: wages and salaries are
+#   70.0% of private-industry compensation, so loaded cost = salary / 0.70
+# Source: ClickHouse Inc. job postings on himalayas.app (updated 2026-10-27): Senior Cloud
+#   Data Infrastructure Engineer $133k-$197k, Senior Infrastructure Engineer - Postgres
+#   $140k-$208k: the same employer pays both skills alike, so no premium in the base case
+# ---------------------------------------------------------------------------------------
+[labour]
+dba_salary = 104620               # database administrators, operations
+architect_salary = 139500         # database architects, migration engineering
+wage_share = 0.70
+clickhouse_premium = 0.0          # sensitivity: scarcity premium for ClickHouse operators
+ops_fte_pg = 0.5                  # assumption: same operations effort on both engines
+ops_fte_ch = 0.5
+working_days_per_year = 220
+
+# ---------------------------------------------------------------------------------------
+# Migration (ClickHouse only, one-off; all assumptions, sized from the benchmark's findings)
+# ---------------------------------------------------------------------------------------
+[migration]
+reports = 100                     # assumption: regulatory reports to migrate
+days_per_report = 2               # port to ClickHouse SQL, final = 1, decimal review, validate
+days_per_fix = 3                  # extra for a report that needs tuning or a rewrite
+pipeline_weeks = 10               # ReplacingMergeTree rebuild, versioned writes, retries,
+                                  #   admission control, REPLACE PARTITION restatements
+parallel_run_months = 3           # both systems in production, results reconciled
+parallel_run_fte = 0.5
